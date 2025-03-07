@@ -9,7 +9,7 @@ app.use(cors());
 const db = require('./models');
 const usersRouter = require('./routes/Login'); // ✅ Ensure correct import
 
-app.use("/login", usersRouter); // ✅ Use a valid route prefix
+app.use("/login", usersRouter);// Use a valid route prefix
 
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {
