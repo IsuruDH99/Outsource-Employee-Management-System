@@ -1,20 +1,17 @@
 module.exports = (sequelize, DataTypes) => {
-    const Login = sequelize.define("Login", {
-      id: {
+    const Workeradd = sequelize.define("Workeradd", {
+      epf: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
       },
-      email: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      
+      
     });
   
-    return Login;
+    return Workeradd;
   };

@@ -1,27 +1,44 @@
 const express = require("express");
 const router = express.Router();
-const { Login } = require("../models"); // Ensure this model exists
+const { Login } = require("../models");
 
-// Example route to handle user login (adjust as needed)
+// User registration endpoint
 router.post("/", async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        
-        // Example logic (adjust based on your authentication needs)
-        const user = await Login.findOne({ where: { username } });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+  try {
+    const { email, password } = req.body;
 
-        if (user.password !== password) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-
-        res.json({ message: "Login successful" });
-
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
     }
+
+    await Login.create({ email, password });
+
+    res.status(201).json({ message: "User registered successfully!" });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-module.exports = router; // ✅ Correct export
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await Login.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    res.status(200).json({ message: "Login successful" });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+module.exports = router;

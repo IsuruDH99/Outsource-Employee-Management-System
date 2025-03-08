@@ -7,9 +7,21 @@ app.use(express.json());
 app.use(cors());
 
 const db = require('./models');
-const usersRouter = require('./routes/Login'); // ✅ Ensure correct import
 
-app.use("/login", usersRouter);// Use a valid route prefix
+const usersRouter = require('./routes/Login');
+app.use("/auth", usersRouter);
+
+const attendanceRouter = require('./routes/Attendance');
+app.use("/attendance", attendanceRouter);
+
+const producteditRouter = require('./routes/Productedit');
+app.use("/productedit", producteditRouter);
+
+const workeraddRouter = require('./routes/Workeradd');
+app.use("/workeradd", workeraddRouter);
+
+const salarycalRouter = require('./routes/Salarycal');
+app.use("/salarycal", salarycalRouter);
 
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {

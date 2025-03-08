@@ -1,52 +1,40 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const navigate = useNavigate();
+const UserReg = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:3001/auth/login", {
-        email,
-        password,
+      const response = await axios.post("http://localhost:3001/auth", {
+        email: email,
+        password: password,
       });
 
-      if (response.status === 200) {
-        setMessage("Login successful!");
-        navigate("/dashboard"); // Redirect to dashboard
+      if (response.status === 201) {
+        setMessage("User registered successfully!");
+        setEmail('');
+        setPassword('');
       }
     } catch (error) {
-      if (error.response) {
-        setMessage(error.response.data.error || "Login failed");
-      } else {
-        setMessage("Server error");
-      }
+      setMessage("Error registering user");
+      console.error(error);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">User Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">User Registration</h2>
 
-        {message && (
-          <p className="text-center text-sm text-red-600">{message}</p>
-        )}
+        {message && <p className="text-center text-sm text-red-600">{message}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-600"
-            >
-              Email Address
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email Address</label>
             <input
               type="email"
               id="email"
@@ -59,12 +47,7 @@ const Login = () => {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-600"
-            >
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-600">Password</label>
             <input
               type="password"
               id="password"
@@ -80,7 +63,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
           >
-            Login
+            Submit
           </button>
         </form>
       </div>
@@ -88,4 +71,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default UserReg;

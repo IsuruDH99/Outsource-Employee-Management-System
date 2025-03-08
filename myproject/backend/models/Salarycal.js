@@ -1,20 +1,23 @@
 module.exports = (sequelize, DataTypes) => {
-    const Login = sequelize.define("Login", {
-      id: {
+    const Salarycal = sequelize.define("Salarycal", {
+      productNo: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
       },
-      email: {
+      ProductName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
-        type: DataTypes.STRING,
+      quantity: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
+      payments: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      }
     });
   
-    return Login;
+    return Salarycal;
   };

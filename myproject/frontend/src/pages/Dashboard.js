@@ -15,7 +15,7 @@ const Dashboard = () => {
           <div class="p-5">
             <a href="#">
               <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Noteworthy technology acquisitions 2021
+              Manage Employee
               </h5>
             </a>
             <a
@@ -53,7 +53,7 @@ const Dashboard = () => {
           <div class="p-5">
             <a href="#">
               <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Innovative breakthroughs in AI
+              View Attendance
               </h5>
             </a>
             <a
@@ -91,7 +91,7 @@ const Dashboard = () => {
           <div class="p-5">
             <a href="#">
               <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Cloud computing trends for 2021
+             Salary Calculation
               </h5>
             </a>
             <a
@@ -129,7 +129,7 @@ const Dashboard = () => {
           <div class="p-5">
             <a href="#">
               <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                The future of remote work in tech
+                Manage Products
               </h5>
             </a>
             <a
@@ -167,7 +167,7 @@ const Dashboard = () => {
           <div class="p-5">
             <a href="#">
               <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Sustainable technology in the 21st century
+               Perfomance Tracking
               </h5>
             </a>
             <a

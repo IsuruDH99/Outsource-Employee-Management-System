@@ -9,8 +9,8 @@ const Salarycal = () => {
     { code: "P002", name: "Product B", quantity: 0, payment: 0 },
   ]);
   const [workHours, setWorkHours] = useState(0);
-  const [processedWorkers, setProcessedWorkers] = useState([]); // To keep track of processed workers for a specific date
-  const dayPayRate = 10; // Assume $10 per hour
+  const [processedWorkers, setProcessedWorkers] = useState([]);
+  const dayPayRate = 10;
 
   const workersList = [
     { epf: "12345", name: "John Doe" },
@@ -30,165 +30,112 @@ const Salarycal = () => {
   const handleQuantityChange = (index, value) => {
     const updatedProducts = [...targetProducts];
     updatedProducts[index].quantity = value;
-    updatedProducts[index].payment = value * 5; // Assume $5 per unit
+    updatedProducts[index].payment = value * 5;
     setTargetProducts(updatedProducts);
   };
 
-  const totalTargetPayment = targetProducts.reduce(
-    (sum, p) => sum + p.payment,
-    0
-  );
+  const totalTargetPayment = targetProducts.reduce((sum, p) => sum + p.payment, 0);
   const totalDayPay = workHours * dayPayRate;
 
-  const handleWorkerChange = (e) => {
-    setWorker(e.target.value);
-  };
-
   const handleSubmit = () => {
-    // Add current worker to processed list for the selected date
     if (workerType === "Target") {
-      setProcessedWorkers((prev) => [
-        ...prev,
-        { epf: worker, date },
-      ]);
+      setProcessedWorkers((prev) => [...prev, { epf: worker, date }]);
     }
     alert("Salary submitted successfully!");
   };
 
   const filteredWorkersList = workersList.filter(
-    (w) =>
-      !processedWorkers.some(
-        (processed) => processed.epf === w.epf && processed.date === date
-      )
+    (w) => !processedWorkers.some((processed) => processed.epf === w.epf && processed.date === date)
   );
 
-  const handleClear = () => {
-    setDate("");
-    setWorker("");
-    setTargetProducts(
-      targetProducts.map((p) => ({ ...p, quantity: 0, payment: 0 }))
-    );
-    setWorkHours(0);
-    setProcessedWorkers([]);
-  };
-
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-xl font-bold mb-4">Salary Calculator</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 text-center">Salary Calculator</h2>
 
-      {/* Navbar for Worker Type */}
-      <nav className="flex mb-4">
-        <button
-          onClick={() => setWorkerType("Target")}
-          className={`px-4 py-2 ${
-            workerType === "Target" ? "bg-blue-500 text-white" : "bg-gray-300"
-          } rounded-l`}
-        >
-          Target
-        </button>
-        <button
-          onClick={() => setWorkerType("Day Pay")}
-          className={`px-4 py-2 ${
-            workerType === "Day Pay" ? "bg-blue-500 text-white" : "bg-gray-300"
-          } rounded-r`}
-        >
-          Day Pay
-        </button>
-      </nav>
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => setWorkerType("Target")}
+            className={`px-4 py-2 rounded-l ${
+              workerType === "Target" ? "bg-blue-500 text-white" : "bg-gray-300"
+            }`}
+          >
+            Target
+          </button>
+          <button
+            onClick={() => setWorkerType("Day Pay")}
+            className={`px-4 py-2 rounded-r ${
+              workerType === "Day Pay" ? "bg-blue-500 text-white" : "bg-gray-300"
+            }`}
+          >
+            Day Pay
+          </button>
+        </div>
 
-      {/* Date Picker */}
-      <label className="block">Select Date:</label>
-      <input
-        type="date"
-        value={date}
-        onChange={handleDateChange}
-        className="border p-2 rounded mb-4 w-128"
-      />
+        <label className="block mb-2">Select Date:</label>
+        <input type="date" value={date} onChange={handleDateChange} className="border p-2 w-full rounded mb-4" />
 
-      {/* Worker Dropdown */}
-      <label className="block">Select Worker:</label>
-      <select
-        value={worker}
-        onChange={handleWorkerChange}
-        className="border p-2 rounded mb-4 w-128"
-      >
-        <option value="">Select Worker</option>
-        {filteredWorkersList.map((w) => (
-          <option key={w.epf} value={w.epf}>
-            {`${w.epf} - ${w.name}`}
-          </option>
-        ))}
-      </select>
+        <label className="block mb-2">Select Worker:</label>
+        <select value={worker} onChange={(e) => setWorker(e.target.value)} className="border p-2 w-full rounded mb-4">
+          <option value="">Select Worker</option>
+          {filteredWorkersList.map((w) => (
+            <option key={w.epf} value={w.epf}>{`${w.epf} - ${w.name}`}</option>
+          ))}
+        </select>
 
-      {/* Target Worker Table */}
-      {workerType === "Target" && (
-        <div>
-          <table className="w-full border mb-4">
-            <thead>
-              <tr className="bg-gray-300 text-center">
-                <th className="max-w-[120px]">Product Code</th>
-                <th className="max-w-[180px]">Product Name</th>
-                <th className="max-w-[100px]">Quantity</th>
-                <th className="max-w-[120px]">Payments</th>
-              </tr>
-            </thead>
-            <tbody>
-              {targetProducts.map((product, index) => (
-                <tr key={product.code} className="text-center">
-                  <td className="border p-2">{product.code}</td>
-                  <td className="border p-2">{product.name}</td>
-                  <td className="border p-2">
-                    <input
-                      type="number"
-                      min="0"
-                      value={product.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          index,
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className="border p-1 w-128"
-                    />
-                  </td>
-                  <td className="border p-2">${product.payment}</td>
+        {workerType === "Target" && (
+          <div>
+            <table className="w-full border mb-4 text-center">
+              <thead>
+                <tr className="bg-gray-300">
+                  <th className="p-2">Product Code</th>
+                  <th className="p-2">Product Name</th>
+                  <th className="p-2">Quantity</th>
+                  <th className="p-2">Payments</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {targetProducts.map((product, index) => (
+                  <tr key={product.code}>
+                    <td className="border p-2">{product.code}</td>
+                    <td className="border p-2">{product.name}</td>
+                    <td className="border p-2">
+                      <input
+                        type="number"
+                        min="0"
+                        value={product.quantity}
+                        onChange={(e) => handleQuantityChange(index, parseInt(e.target.value) || 0)}
+                        className="border p-1 w-16 text-center"
+                      />
+                    </td>
+                    <td className="border p-2">Rs.{product.payment}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <h3 className="font-bold text-center">Total Payment: Rs.{totalTargetPayment}</h3>
+          </div>
+        )}
 
-          <h3 className="font-bold">Total Payment: ${totalTargetPayment}</h3>
+        {workerType === "Day Pay" && (
+          <div>
+            <label className="block mb-2">Enter Work Hours:</label>
+            <input
+              type="number"
+              min="0"
+              value={workHours}
+              onChange={(e) => setWorkHours(parseInt(e.target.value) || 0)}
+              className="border p-2 w-full rounded mb-4"
+            />
+            <h3 className="font-bold text-center">Total Day Pay: Rs.{totalDayPay}</h3>
+          </div>
+        )}
+
+        <div className="flex justify-between mt-4">
+          <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={() => window.location.reload()}>Clear</button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>Submit</button>
         </div>
-      )}
-
-      {/* Day Pay Worker Table */}
-      {workerType === "Day Pay" && (
-        <div>
-          <label className="block">Enter Work Hours:</label>
-          <input
-            type="number"
-            min="0"
-            value={workHours}
-            onChange={(e) => setWorkHours(parseInt(e.target.value) || 0)}
-            className="border p-2 rounded mb-4 w-32"
-          />
-          <h3 className="font-bold">Total Day Pay: ${totalDayPay}</h3>
-        </div>
-      )}
-
-      {/* Buttons */}
-      <button
-        onClick={handleClear}
-        className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
-      >
-        Clear
-      </button>
-      <button
-        onClick={handleSubmit}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Submit
-      </button>
+      </div>
     </div>
   );
 };
