@@ -7,9 +7,7 @@ const ProductEdit = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [productDetails, setProductDetails] = useState({
-    productCode: 'P001',
-    productName: 'Apple MacBook Pro 17"',
-    price: 2999,
+    
   });
 
   const handleSave = () => {

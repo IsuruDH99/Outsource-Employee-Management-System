@@ -1,197 +1,66 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Dropdown } from "react-bootstrap";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   return (
-    <div>
-      <div class="flex space-x-4">
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <img
-              class="rounded-t-lg"
-              src="/docs/images/blog/image-1.jpg"
-              alt=""
-            />
-          </a>
-          <div class="p-5">
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Manage Employee
-              </h5>
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Read more
-              <svg
-                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
+    <div className="flex flex-wrap justify-center gap-4 p-5">
+      {/* Manage Employee Card with Dropdown */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Manage Employee</h5>
+          <img src="C:/Users/DELL/Pictures/Screenshots/img.png" alt="Manage Employee" className="w-full h-40 object-cover mb-3" />
+          <Dropdown>
+            <Dropdown.Toggle variant="primary">Manage Employee</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => navigate("/Workeradd")}>Add Workers</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/Workerview")}>View Workers</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
+      </div>
 
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <img
-              class="rounded-t-lg"
-              src="/docs/images/blog/image-2.jpg"
-              alt=""
-            />
-          </a>
-          <div class="p-5">
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              View Attendance
-              </h5>
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Read more
-              <svg
-                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
+      {/* View Attendance Card */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">View Attendance</h5>
+          <img src="/images/view_attendance.jpg" alt="View Attendance" className="w-full h-40 object-cover mb-3" />
+          <Button onClick={() => navigate("/attendance")}>View Attendance</Button>
         </div>
+      </div>
 
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <img
-              class="rounded-t-lg"
-              src="/docs/images/blog/image-3.jpg"
-              alt=""
-            />
-          </a>
-          <div class="p-5">
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-             Salary Calculation
-              </h5>
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Read more
-              <svg
-                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
+      {/* Salary Calculation Card with Dropdown */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Salary Calculation</h5>
+          <img src="/images/salary_calculation.jpg" alt="Salary Calculation" className="w-full h-40 object-cover mb-3" />
+          <Dropdown>
+            <Dropdown.Toggle variant="primary">Salary Calculation</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => navigate("/salarycal")}>Salary Calculate</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/salaryview")}>Salary View</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
+      </div>
 
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <img
-              class="rounded-t-lg"
-              src="/docs/images/blog/image-4.jpg"
-              alt=""
-            />
-          </a>
-          <div class="p-5">
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Manage Products
-              </h5>
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Read more
-              <svg
-                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
+      {/* Manage Products Card */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Manage Products</h5>
+          <img src="/images/manage_products.jpg" alt="Manage Products" className="w-full h-40 object-cover mb-3" />
+          <Button onClick={() => navigate("/productedit")}>Manage Products</Button>
         </div>
+      </div>
 
-        <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <a href="#">
-            <img
-              class="rounded-t-lg"
-              src="/docs/images/blog/image-5.jpg"
-              alt=""
-            />
-          </a>
-          <div class="p-5">
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-               Perfomance Tracking
-              </h5>
-            </a>
-            <a
-              href="#"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Read more
-              <svg
-                class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
+      {/* Performance Tracking Card */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Performance Tracking</h5>
+          <img src="/images/performance_tracking.jpg" alt="Performance Tracking" className="w-full h-40 object-cover mb-3" />
+          <Button onClick={() => navigate("/")}>Performance Tracking</Button>
         </div>
       </div>
     </div>

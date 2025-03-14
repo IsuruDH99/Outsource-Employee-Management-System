@@ -1,32 +1,43 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Workeradd = () => {
   const [employeeName, setEmployeeName] = useState('');
   const [epf, setEpf] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Basic validation (Make sure fields are not empty)
     if (!employeeName || !epf) {
       setError('Please fill in both fields.');
       return;
     }
-
+  
     // Clear error if validation passes
     setError('');
-
-    // Mock API call or state update
+  
+    // Create employee data object
     const newEmployee = {
       name: employeeName,
       epf: epf,
     };
-
-    console.log('Employee Added:', newEmployee);
-
-    // Here, you would typically send this data to a backend API
-    // For now, we'll just log it to the console.
+  
+    try {
+      // Send data to backend API
+      const response = await axios.post('http://localhost:3001/workeradd/add-employee', newEmployee);
+  
+      // Log response from server
+      console.log('Employee Added:', newEmployee);
+  
+      // Optionally, clear input fields after successful submission
+      setEmployeeName('');
+      setEpf('');
+    } catch (error) {
+      console.error('Error adding employee:', error);
+      setError('Failed to add employee. Please try again.');
+    }
   };
 
   return (

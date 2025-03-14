@@ -46,19 +46,7 @@ const Attendance = () => {
               <th scope="col" className="px-6 py-3">Out Time</th>
             </tr>
           </thead>
-          <tbody>
-            {[{ epf: "12345", name: "John Doe", date: "2025-02-18", inTime: "09:00 AM", outTime: "05:00 PM" }, { epf: "67890", name: "Jane Smith", date: "2025-02-18", inTime: "08:45 AM", outTime: "04:30 PM" }, { epf: "11223", name: "Alex Johnson", date: "2025-02-18", inTime: "09:15 AM", outTime: "06:00 PM" }].map((record, index) => (
-              <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {record.epf}
-                </th>
-                <td className="px-6 py-4">{record.name}</td>
-                <td className="px-6 py-4">{record.date}</td>
-                <td className="px-6 py-4">{record.inTime}</td>
-                <td className="px-6 py-4">{record.outTime}</td>
-              </tr>
-            ))}
-          </tbody>
+          
         </table>
       </div>
     </div>

@@ -34,9 +34,7 @@ const SalaryView = () => {
     try {
       setTimeout(() => {
         const dummyData = [
-          { epfNo: '12345', name: 'John Doe', monthlySalary: '5000' },
-          { epfNo: '67890', name: 'Jane Smith', monthlySalary: '6000' },
-          { epfNo: '11223', name: 'David Lee', monthlySalary: '5500' },
+          
         ];
         setSalaryData(dummyData);
       }, 500);
