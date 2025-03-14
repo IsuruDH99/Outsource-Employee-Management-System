@@ -10,6 +10,9 @@ import Header from "./components/Header";
 import UserReg from "./pages/UserReg";
 import Home from "./pages/Home";
 import SalaryView from "./pages/SalaryView";
+import TaskAssign from "./pages/TaskAssign";
+import TaskKpi from "./pages/TaskKpi";
+
 
 function App() {
   return (
@@ -27,7 +30,8 @@ function App() {
           <Route path='/productedit' element={<Productedit/>}/>
           <Route path='/salarycal' element={<Salarycal/>}/>
           <Route path='/salaryView' element={<SalaryView/>}/>
-
+          <Route path='/taskassign' element={<TaskAssign/>}/>
+          <Route path='/taskkpi' element={<TaskKpi/>}/>
         </Routes>
       </Router>
       
