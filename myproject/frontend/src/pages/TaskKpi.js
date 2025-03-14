@@ -7,16 +7,16 @@ const TaskKpi = () => {
 
   // Sample KPI Data
   const [kpiData, setKpiData] = useState([
-    { epf: 1002, name: "Alice", productCode: "P345", productName: "Gadget X", targetTime: 6, actualTime: 5.5, kpi: 92 },
-    { epf: 1001, name: "John", productCode: "P123", productName: "Widget A", targetTime: 5, actualTime: 4.5, kpi: 90 },
-    { epf: 1003, name: "Bob", productCode: "P678", productName: "Device Z", targetTime: 7, actualTime: 6, kpi: 86 },
+    { epf: 1002, name: "Alice", productCode: "P345", productName: "Gadget X", targetTime: 6, actualTime: 5.5, kpi: (6 / 5.5).toFixed(2) },
+    { epf: 1001, name: "John", productCode: "P123", productName: "Widget A", targetTime: 5, actualTime: 4.5, kpi: (5 / 4.5).toFixed(2) },
+    { epf: 1003, name: "Bob", productCode: "P678", productName: "Device Z", targetTime: 7, actualTime: 6, kpi: (7 / 6).toFixed(2) },
   ]);
 
   // Function to update actual time and calculate KPI
   const updateActualTime = (index, actualTime) => {
     const updatedKpiData = [...kpiData];
     updatedKpiData[index].actualTime = actualTime;
-    const kpi = ((updatedKpiData[index].targetTime / actualTime) * 100).toFixed(2);
+    const kpi = (updatedKpiData[index].targetTime / actualTime).toFixed(2);
     updatedKpiData[index].kpi = kpi;
     setKpiData(updatedKpiData);
   };
@@ -69,7 +69,7 @@ const TaskKpi = () => {
               <th className="p-2 border">Product Name</th>
               <th className="p-2 border">Target Time</th>
               <th className="p-2 border">Actual Time</th>
-              <th className="p-2 border">KPI (%)</th>
+              <th className="p-2 border">KPI</th> 
             </tr>
           </thead>
           <tbody>
@@ -90,7 +90,7 @@ const TaskKpi = () => {
                     className="border px-2 py-1 text-sm rounded"
                   />
                 </td>
-                <td className="p-2 border text-green-600">{item.kpi}%</td>
+                <td className="p-2 border text-green-600">{item.kpi}</td>
               </tr>
             ))}
           </tbody>

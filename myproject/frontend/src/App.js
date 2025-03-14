@@ -12,7 +12,10 @@ import Home from "./pages/Home";
 import SalaryView from "./pages/SalaryView";
 import TaskAssign from "./pages/TaskAssign";
 import TaskKpi from "./pages/TaskKpi";
-
+import TaskPerformance from "./pages/TaskPerformance";
+import ProductAdd from "./pages/ProductAdd";
+import AddAttendance from "./pages/AddAttendance";
+import KPI from "./pages/KPI";
 
 function App() {
   return (
@@ -32,6 +35,11 @@ function App() {
           <Route path='/salaryView' element={<SalaryView/>}/>
           <Route path='/taskassign' element={<TaskAssign/>}/>
           <Route path='/taskkpi' element={<TaskKpi/>}/>
+          <Route path='/taskPerformance' element={<TaskPerformance/>}/>
+          <Route path='/productAdd' element={<ProductAdd/>}/>
+          <Route path='/add-attendance' element={<AddAttendance/>}/>
+          <Route path='/kpi' element={<KPI/>}/>
+        
         </Routes>
       </Router>
       

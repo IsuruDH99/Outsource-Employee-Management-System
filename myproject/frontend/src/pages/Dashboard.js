@@ -1,6 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Dropdown } from "react-bootstrap";
+import attendance from "../Images/attendance.jpg"
+import salary from "../Images/salary.jpeg"
+import emp from "../Images/emp.jpg"
+import product from "../Images/product.jpg"
+import kpi from "../Images/kpi.jpg"
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,7 +16,7 @@ const Dashboard = () => {
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
           <h5 className="mb-2 text-2xl font-bold">Manage Employee</h5>
-          <img src="C:/Users/DELL/Pictures/Screenshots/img.png" alt="Manage Employee" className="w-full h-40 object-cover mb-3" />
+          <img src={emp} alt="Manage Employee" className="w-full h-40 object-cover mb-3" />
           <Dropdown>
             <Dropdown.Toggle variant="primary">Manage Employee</Dropdown.Toggle>
             <Dropdown.Menu>
@@ -26,7 +31,7 @@ const Dashboard = () => {
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
           <h5 className="mb-2 text-2xl font-bold">View Attendance</h5>
-          <img src="/images/view_attendance.jpg" alt="View Attendance" className="w-full h-40 object-cover mb-3" />
+          <img src={attendance} alt="View Attendance" className="w-full h-40 object-cover mb-3" />
           <Button onClick={() => navigate("/attendance")}>View Attendance</Button>
         </div>
       </div>
@@ -35,7 +40,7 @@ const Dashboard = () => {
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
           <h5 className="mb-2 text-2xl font-bold">Salary Calculation</h5>
-          <img src="/images/salary_calculation.jpg" alt="Salary Calculation" className="w-full h-40 object-cover mb-3" />
+          <img src={salary} alt="Salary Calculation" className="w-full h-40 object-cover mb-3" />
           <Dropdown>
             <Dropdown.Toggle variant="primary">Salary Calculation</Dropdown.Toggle>
             <Dropdown.Menu>
@@ -50,7 +55,7 @@ const Dashboard = () => {
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
           <h5 className="mb-2 text-2xl font-bold">Manage Products</h5>
-          <img src="/images/manage_products.jpg" alt="Manage Products" className="w-full h-40 object-cover mb-3" />
+          <img src={product} alt="Manage Products" className="w-full h-40 object-cover mb-3" />
           <Button onClick={() => navigate("/productedit")}>Manage Products</Button>
         </div>
       </div>
@@ -58,9 +63,15 @@ const Dashboard = () => {
       {/* Performance Tracking Card */}
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
-          <h5 className="mb-2 text-2xl font-bold">Performance Tracking</h5>
-          <img src="/images/performance_tracking.jpg" alt="Performance Tracking" className="w-full h-40 object-cover mb-3" />
-          <Button onClick={() => navigate("/")}>Performance Tracking</Button>
+          <h5 className="mb-2 text-2xl font-bold">Manage Work Package</h5>
+          <img src={kpi} alt="Performance Tracking" className="w-full h-40 object-cover mb-3" />
+          <Dropdown>
+            <Dropdown.Toggle variant="primary">Manage Work Package</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => navigate("/kpi")}>Work Manage</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/taskPerformance")}>View Performance</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       </div>
     </div>

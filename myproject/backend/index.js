@@ -14,8 +14,8 @@ app.use("/auth", usersRouter);
 const attendanceRouter = require('./routes/Attendance');
 app.use("/attendance", attendanceRouter);
 
-const producteditRouter = require('./routes/Productedit');
-app.use("/productedit", producteditRouter);
+const producteditRouter = require('./routes/Target');
+app.use("/target", producteditRouter);
 
 const workeraddRouter = require('./routes/Workeradd');
 app.use("/workeradd", workeraddRouter);
