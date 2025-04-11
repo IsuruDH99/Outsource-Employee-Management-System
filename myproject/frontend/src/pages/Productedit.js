@@ -86,71 +86,7 @@ const ProductEdit = () => {
         <DayPay priceLabel={"Payment per Hour (Rs.)"} noArrows={true} />
       )}
 
-      {/* Popup Form to Edit Product */}
-      {/* {isEditing && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Edit Product</h2>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Product Code
-              </label>
-              <input
-                type="text"
-                value={productDetails.productNo || ""}
-                readOnly
-                className="mt-1 block w-full p-2 border bg-gray-100 rounded-md cursor-not-allowed"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Product Name
-              </label>
-              <input
-                type="text"
-                value={productDetails.productName || ""}
-                onChange={(e) =>
-                  setProductDetails({
-                    ...productDetails,
-                    productName: e.target.value,
-                  })
-                }
-                className="mt-1 block w-full p-2 border rounded-md"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Price (Rs.)
-              </label>
-              <input
-                type="number"
-                value={productDetails.price || ""}
-                onChange={(e) =>
-                  setProductDetails({
-                    ...productDetails,
-                    price: e.target.value,
-                  })
-                }
-                className="mt-1 block w-full p-2 border rounded-md"
-              />
-            </div>
-            <div className="flex justify-between">
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+      
 
       {/* Success Message */}
       {isSaved && <p className="mt-2 text-green-600">Successfully saved</p>}

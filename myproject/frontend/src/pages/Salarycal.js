@@ -5,8 +5,8 @@ const Salarycal = () => {
   const [workerType, setWorkerType] = useState("Target");
   const [worker, setWorker] = useState("");
   const [targetProducts, setTargetProducts] = useState([
-    { code: "P001", name: "Product A", quantity: 0, payment: 0 },
-    { code: "P002", name: "Product B", quantity: 0, payment: 0 },
+    { code: "P001", name: "30 Box packing", quantity: 0, payment: 0 },
+    { code: "P002", name: "100 Box packing", quantity: 0, payment: 0 },
   ]);
   const [workHours, setWorkHours] = useState(0);
   const [processedWorkers, setProcessedWorkers] = useState([]);

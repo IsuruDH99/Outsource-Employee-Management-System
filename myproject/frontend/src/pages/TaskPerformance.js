@@ -1,144 +1,3 @@
-// import React, { useState } from "react";
-
-// const TaskPerformance = () => {
-//   const [selectedVehicles, setSelectedVehicles] = useState([]);
-  
-//   const vehicles = [
-//     "Car",
-//     "Truck",
-//     "Motorcycle",
-//     "Bicycle",
-//     "Bus",
-//     "Van",
-//   ];
-
-//   const handleVehicleChange = (vehicle) => {
-//     setSelectedVehicles((prevSelected) => {
-//       if (prevSelected.includes(vehicle)) {
-//         return prevSelected.filter((v) => v !== vehicle); // Remove if already selected
-//       } else {
-//         return [...prevSelected, vehicle]; // Add if not selected
-//       }
-//     });
-//   };
-
-//   return (
-//     <div className="p-6 max-w-lg mx-auto mt-10 border rounded-lg shadow-lg">
-//       <h2 className="text-xl font-bold mb-4">Select Vehicle Types</h2>
-
-//       <div className="space-y-2">
-//         {vehicles.map((vehicle) => (
-//           <div
-//             key={vehicle}
-//             className={`cursor-pointer p-2 rounded border ${
-//               selectedVehicles.includes(vehicle) ? "bg-blue-500 text-white" : "bg-gray-100"
-//             }`}
-//             onClick={() => handleVehicleChange(vehicle)}
-//           >
-//             {vehicle}
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Display selected vehicles */}
-//       <div className="mt-4">
-//         <h3 className="font-semibold">Selected Vehicles:</h3>
-//         <ul>
-//           {selectedVehicles.map((vehicle, index) => (
-//             <li key={index} className="mt-1">{vehicle}</li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default TaskPerformance;
-
-// import React, { useState } from "react";
-
-// const TaskPerformance = () => {
-//   const [selectedVehicles, setSelectedVehicles] = useState([]);
-//   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
-
-//   const vehicles = [
-//     "Car",
-//     "Truck",
-//     "Motorcycle",
-//     "Bicycle",
-//     "Bus",
-//     "Van",
-//   ];
-
-//   const handleVehicleChange = (vehicle) => {
-//     setSelectedVehicles((prevSelected) => {
-//       if (prevSelected.includes(vehicle)) {
-//         return prevSelected.filter((v) => v !== vehicle); // Remove if already selected
-//       } else {
-//         return [...prevSelected, vehicle]; // Add if not selected
-//       }
-//     });
-//   };
-
-//   const toggleDropdown = () => {
-//     setIsDropdownOpen((prev) => !prev); // Toggle dropdown visibility
-//   };
-
-//   return (
-//     <div className="p-6 max-w-lg mx-auto mt-10 border rounded-lg shadow-lg">
-//       <h2 className="text-xl font-bold mb-4">Select Vehicle Types</h2>
-
-//       <div className="relative">
-//         {/* Dropdown Trigger Button */}
-//         <button
-//           onClick={toggleDropdown}
-//           className="w-full p-2 border rounded-lg bg-gray-100 text-left"
-//         >
-//           {selectedVehicles.length > 0
-//             ? selectedVehicles.join(", ")
-//             : "Select vehicles"}
-//         </button>
-
-//         {/* Dropdown Content */}
-//         {isDropdownOpen && (
-//           <div className="absolute z-10 w-full mt-2 border rounded-lg bg-white shadow-lg">
-//             <div className="space-y-2 p-2">
-//               {vehicles.map((vehicle) => (
-//                 <label
-//                   key={vehicle}
-//                   className="flex items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg"
-//                 >
-//                   <input
-//                     type="checkbox"
-//                     value={vehicle}
-//                     checked={selectedVehicles.includes(vehicle)}
-//                     onChange={() => handleVehicleChange(vehicle)}
-//                     className="mr-2"
-//                   />
-//                   {vehicle}
-//                 </label>
-//               ))}
-//             </div>
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Display selected vehicles */}
-//       <div className="mt-4">
-//         <h3 className="font-semibold">Selected Vehicles:</h3>
-//         <ul>
-//           {selectedVehicles.map((vehicle, index) => (
-//             <li key={index} className="mt-1">
-//               {vehicle}
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default TaskPerformance;
 
 import React, { useState, useRef, useEffect } from "react";
 
@@ -246,7 +105,7 @@ const TaskPerformance = () => {
       </div>
 
       {/* Display selected vehicles */}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <h3 className="font-semibold">Selected Vehicles:</h3>
         <ul>
           {selectedVehicles.map((vehicle, index) => (
@@ -255,7 +114,8 @@ const TaskPerformance = () => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
+
     </div>
   );
 };

@@ -1,64 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { FaEdit } from "react-icons/fa";
+const DayPay = () => {
+  // Set initial value (default Rs. 100)
+  const [payment, setPayment] = useState(100);
+  const [editValue, setEditValue] = useState(payment);
+  const [showPopup, setShowPopup] = useState(false);
 
-const DayPay = ({ priceLabel, noArrows }) => {
-  const [price, setPrice] = useState('');
-
-  const handleClear = () => {
-    setPrice('');
-  };
+  useEffect(() => {
+    // Optional: fetch from backend if needed
+    fetch("http://localhost:3001/daypay")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.paymentPerHour) {
+          setPayment(data.paymentPerHour);
+          setEditValue(data.paymentPerHour);
+        }
+      })
+      .catch(() => {
+        // fallback to default
+        console.warn("Using default payment/hour (Rs. 100)");
+      });
+  }, []);
 
   const handleSave = () => {
-    alert('Payment per Hour saved: ' + price);
+    // Update state
+    setPayment(Number(editValue));
+    setShowPopup(false);
+
+    // Optionally send to backend
+    fetch("http://localhost:3001/daypay/update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paymentPerHour: Number(editValue) }),
+    }).catch((err) => {
+      console.error("Failed to update:", err);
+      alert("Failed to update");
+    });
   };
 
   return (
-    <div className="flex flex-col space-y-4">
-      <label className="text-lg font-semibold">{priceLabel}</label>
-      <input
-        type="number"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        className="p-2 border border-gray-300 rounded w-32"  // Reduced width
-        style={noArrows ? { '-moz-appearance': 'textfield', '-webkit-appearance': 'none', appearance: 'none' } : {}}
-      />
-      <div className="flex space-x-4 mt-4">
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Save
-        </button>
-        <button
-          onClick={handleClear}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-        >
-          Clear
-        </button>
+    <div className="p-4 w-full max-w-md">
+      <div className="grid grid-cols-2 gap-4 font-semibold border-b pb-2 mb-4 text-left">
+        <div>Payment / hour</div>
+        <div>Action</div>
       </div>
+
+      <div className="grid grid-cols-2 gap-4 items-center text-left">
+        <div className="text-lg">Rs. {payment}</div>
+        <button
+  onClick={() => setShowPopup(true)}
+  className="flex items-center space-x-2 font-medium text-blue-600 dark:text-blue-400 hover:underline border-2 border-blue-600 rounded-lg px-2 py-1 transform transition-all duration-300 hover:scale-100"
+>
+  <FaEdit className="text-lg" />
+  <span>Edit</span>
+</button>
+
+      </div>
+
+      {/* Small edit popup */}
+      {showPopup && (
+        <div className="absolute mt-2 bg-white border border-gray-200 shadow-md rounded-lg p-4 w-64 z-50">
+          <h3 className="text-sm font-semibold mb-2">Edit Payment</h3>
+          <input
+            type="number"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            className="w-full px-2 py-1 border border-gray-300 rounded mb-3 text-sm"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              className="text-sm px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
+              onClick={() => setShowPopup(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="text-sm px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+              onClick={handleSave}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default DayPay;
-
-
- // Make sure to export it as default
-
-
-// export default DayPay;
-// import React from 'react';
-
-// const DayPay = ({ priceLabel, noArrows }) => {
-//   return (
-//     <div className="flex flex-col space-y-4">
-//       <label className="text-lg font-semibold">{priceLabel}</label>
-//       <input
-//         type="number"
-//         className="p-2 border border-gray-300 rounded"
-//         style={noArrows ? { '-moz-appearance': 'textfield', '-webkit-appearance': 'none', appearance: 'none' } : {}}
-//       />
-//     </div>
-//   );
-// };
-
-// export default DayPay;
