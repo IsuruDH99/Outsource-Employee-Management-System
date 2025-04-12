@@ -39,7 +39,7 @@ const DayPay = () => {
   };
 
   return (
-    <div className="p-4 w-full max-w-md">
+    <div className="p-2 w-full max-w-md">
       <div className="grid grid-cols-2 gap-4 font-semibold border-b pb-2 mb-4 text-left">
         <div>Payment / hour</div>
         <div>Action</div>

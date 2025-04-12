@@ -1,161 +1,106 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Button, Form } from "react-bootstrap";
-import DatePicker from "react-datepicker";
-import TimePicker from "react-time-picker";
-import "react-datepicker/dist/react-datepicker.css";
-import "react-time-picker/dist/TimePicker.css";
 
-function AddAttendance() {
-  const [attendanceData, setAttendanceData] = useState({
-    epf: "",
-    date: "",
-    intime: "",
-    outtime: "",
-  });
+const Attendance = () => {
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const currentDate = new Date().toISOString().split("T")[0];
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleFetchAttendance = async () => {
+    if (!fromDate || !toDate) {
+      alert("Please select both from and to dates.");
+      return;
+    }
 
-    setAttendanceData("");
+    setLoading(true);
 
-    axios
-      .post("http://localhost:3001/attendance/add-attendance", attendanceData)
-      .then((response) => {
-        console.log("Attendance added successfully!");
-        // Handle any further actions or notifications
-      })
-      .catch((error) => {
-        console.error("Error adding attendance:", error);
-        // Handle error case
+    try {
+      const response = await axios.get("http://localhost:3001/attendance/get-attendance", {
+        params: { fromDate, toDate },
       });
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setAttendanceData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+      setAttendanceData(response.data);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
-      <div>
-        <div
-          style={{
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            width: "98%",
-            marginLeft: "20px",
-            marginTop: "10px",
-          }}
+    <div className="pt-20 p-4 bg-gray-100 min-h-screen flex flex-col items-center">
+      {/* Title */}
+      <h1 className="text-3xl font-semibold text-gray-700 mb-6 text-center">
+        Attendance
+      </h1>
+
+      {/* Date Inputs + Button */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">From:</label>
+          <input
+            type="date"
+            className="border px-3 py-2 rounded-md shadow-sm text-sm"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            max={currentDate}
+          />
+        </div>
+        <div>
+          <label className="block text-sm text-gray-700 mb-1">To:</label>
+          <input
+            type="date"
+            className="border px-3 py-2 rounded-md shadow-sm text-sm"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            min={fromDate || currentDate}
+            max={currentDate}
+          />
+        </div>
+        <button
+          onClick={handleFetchAttendance}
+          className="bg-blue-500 text-white px-6 py-2 mt-2 md:mt-6 md:ml-4 rounded-md hover:bg-blue-600 transition"
         >
-          <h1
-            style={{
-              fontFamily: "serif",
-              paddingTop: "15px",
-              paddingBottom: "15px",
-              textAlign: "center",
-            }}
-          >
-            Add Attendance
-          </h1>
-        </div>
-        <div className="abc" style={{ paddingTop: "30px" }}>
-          <div style={{ paddingTop: "50px" }}>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group
-                className="mb-3 d-flex justify-content-center align-items-center"
-                controlId="usernameControl"
-              >
-                <Form.Label style={{ paddingRight: "15px" }}>
-                  EPF :
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="epf"
-                  style={{ width: "200px" }}
-                  required
-                  value={attendanceData.epf}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-              <Form.Group
-                className="mb-3 d-flex justify-content-center align-items-center"
-                controlId="dateControl"
-              >
-                <Form.Label style={{ paddingRight: "15px" }}>Date :</Form.Label>
-                <DatePicker
-                  name="date"
-                  dateFormat="yyyy-MM-dd"
-                  required
-                  className="form-control"
-                  style={{ width: "200px" }}
-                  selected={attendanceData.date}
-                  onChange={(date) =>
-                    setAttendanceData((prevState) => ({ ...prevState, date }))
-                  }
-                />
-              </Form.Group>
-              <Form.Group
-                className="mb-3 d-flex justify-content-center align-items-center"
-                controlId="inTimeControl"
-              >
-                <Form.Label style={{ paddingRight: "10px" }}>
-                  In Time :
-                </Form.Label>
-                <div style={{ width: "200px" }}>
-                  <TimePicker
-                    name="intime"
-                    className="form-control"
-                    style={{ width: "100%" }}
-                    value={attendanceData.intime}
-                    onChange={(intime) =>
-                      setAttendanceData((prevState) => ({
-                        ...prevState,
-                        intime,
-                      }))
-                    }
-                  />
-                </div>
-              </Form.Group>
-              <Form.Group
-                className="mb-3 d-flex justify-content-center align-items-center"
-                controlId="outTimeControl"
-              >
-                <Form.Label style={{ paddingRight: "10px" }}>
-                  Out Time :
-                </Form.Label>
-                <div style={{ width: "200px" }}>
-                  <TimePicker
-                    name="outtime"
-                    className="form-control"
-                    style={{ width: "100%" }}
-                    value={attendanceData.outtime}
-                    onChange={(outtime) =>
-                      setAttendanceData((prevState) => ({
-                        ...prevState,
-                        outtime,
-                      }))
-                    }
-                  />
-                </div>
-              </Form.Group>
-              <div style={{ paddingLeft: "750px" }}>
-                <Button
-                  variant="success"
-                  type="submit"
-                  style={{ width: "10%" }}
-                >
-                  Add
-                </Button>
-              </div>
-            </Form>
-          </div>
-        </div>
+          Fetch
+        </button>
+      </div>
+
+      {/* Attendance Table */}
+      <div className="w-full max-w-xl overflow-x-auto rounded-lg shadow bg-white">
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="bg-blue-500 text-white">
+            <tr>
+              <th className="p-1 text-xs border">EPF</th>
+              <th className="p-1 text-xs border">Date</th>
+              <th className="p-1 text-xs border">In Time</th>
+              <th className="p-1 text-xs border">Out Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="text-center p-4">Loading...</td>
+              </tr>
+            ) : attendanceData.length > 0 ? (
+              attendanceData.map((attendance, index) => (
+                <tr key={index} className="text-center">
+                  <td className="p-1 text-xs border">{attendance.epf}</td>
+                  <td className="p-1 text-xs border">{attendance.date}</td>
+                  <td className="p-1 text-xs border">{attendance.intime}</td>
+                  <td className="p-1 text-xs border">{attendance.outtime}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center p-4">No data available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-}
+};
 
-export default AddAttendance;
+export default Attendance;

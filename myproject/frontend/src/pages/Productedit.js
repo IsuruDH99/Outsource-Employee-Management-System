@@ -8,9 +8,8 @@ const ProductEdit = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [productDetails, setProductDetails] = useState({});
   const [isSaved, setIsSaved] = useState(false);
-  const [productNo, setProductNo] = useState(null); // Store selected productNo
+  const [productNo, setProductNo] = useState(null);
 
-  // Fetch product details when `isEditing` is true
   useEffect(() => {
     if (isEditing && productNo) {
       axios
@@ -22,22 +21,21 @@ const ProductEdit = () => {
           console.error("Error fetching product details:", error);
         });
     }
-  }, [isEditing, productNo]); // Runs when isEditing or productNo changes
-  console.log(productDetails);
-  // Function to handle saving edited product
+  }, [isEditing, productNo]);
+
   const handleSave = async () => {
     try {
       await axios.put(
         `http://localhost:3001/target/update-product/${productDetails.productNo}`,
         {
-          ProductName: productDetails.ProductName, // Fix casing issue
+          ProductName: productDetails.ProductName,
           price: productDetails.price,
         }
       );
 
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
-      setIsEditing(false); // Close the popup after saving
+      setIsEditing(false);
     } catch (error) {
       console.error("Error updating product:", error);
       alert("Failed to update product");
@@ -45,51 +43,59 @@ const ProductEdit = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Product Rate Update</h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-6">
+      <div className="w-full max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Product Rate Update
+        </h1>
 
-      {/* Navbar-like Selection */}
-      <div className="border-b border-gray-200 mb-4">
-        <nav className="flex space-x-4">
-          <button
-            onClick={() => setSelectedOption("target")}
-            className={`px-4 py-2 font-medium ${
-              selectedOption === "target"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-          >
-            Target
-          </button>
-          <button
-            onClick={() => setSelectedOption("daypay")}
-            className={`px-4 py-2 font-medium ${
-              selectedOption === "daypay"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-600 hover:text-blue-600"
-            }`}
-          >
-            DayPay
-          </button>
-        </nav>
+        {/* Navbar-like Selection */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="flex justify-center space-x-6">
+            <button
+              onClick={() => setSelectedOption("target")}
+              className={`px-6 py-2 font-medium ${
+                selectedOption === "target"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600 hover:text-blue-600"
+              }`}
+            >
+              Target
+            </button>
+            <button
+              onClick={() => setSelectedOption("daypay")}
+              className={`px-6 py-2 font-medium ${
+                selectedOption === "daypay"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600 hover:text-blue-600"
+              }`}
+            >
+              DayPay
+            </button>
+          </nav>
+        </div>
+
+        {/* Conditional Rendering */}
+        <div className="mb-4">
+          {selectedOption === "target" && (
+            <Target
+              setIsEditing={setIsEditing}
+              setProductDetails={setProductDetails}
+              setProductNo={setProductNo}
+            />
+          )}
+          {selectedOption === "daypay" && (
+            <DayPay priceLabel={"Payment per Hour (Rs.)"} noArrows={true} />
+          )}
+        </div>
+
+        {/* Success Message */}
+        {isSaved && (
+          <p className="mt-2 text-green-600 text-center font-medium">
+            Successfully saved
+          </p>
+        )}
       </div>
-
-      {/* Conditional Rendering */}
-      {selectedOption === "target" && (
-        <Target
-          setIsEditing={setIsEditing}
-          setProductDetails={setProductDetails}
-          setProductNo={setProductNo} // Pass productNo setter
-        />
-      )}
-      {selectedOption === "daypay" && (
-        <DayPay priceLabel={"Payment per Hour (Rs.)"} noArrows={true} />
-      )}
-
-      
-
-      {/* Success Message */}
-      {isSaved && <p className="mt-2 text-green-600">Successfully saved</p>}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { useState } from "react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Workeradd from "./pages/Workeradd";
@@ -12,37 +13,48 @@ import Home from "./pages/Home";
 import SalaryView from "./pages/SalaryView";
 import TaskAssign from "./pages/TaskAssign";
 import TaskKpi from "./pages/TaskKpi";
-import TaskPerformance from "./pages/TaskPerformance";
+import KPIMonthly from "./pages/KPIMonthly";
 import ProductAdd from "./pages/ProductAdd";
 import AddAttendance from "./pages/AddAttendance";
 import KPI from "./pages/KPI";
 
+function AppWrapper() {
+  const location = useLocation();
+  
+  // Hide the Header on /login, /home, and /dashboard pages
+  const showHeader = !['/login', '/', '/dashboard'].includes(location.pathname);
+
+  return (
+    <>
+      {showHeader && <Header />}
+      <Routes>
+        <Route exact path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/UserReg' element={<UserReg />} />
+        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/Workeradd' element={<Workeradd />} />
+        <Route path='/attendance' element={<Attendance />} />
+        <Route path='/workerview' element={<Workerview />} />
+        <Route path='/productedit' element={<Productedit />} />
+        <Route path='/salarycal' element={<Salarycal />} />
+        <Route path='/salaryView' element={<SalaryView />} />
+        <Route path='/taskassign' element={<TaskAssign />} />
+        <Route path='/taskkpi' element={<TaskKpi />} />
+        <Route path='/taskPerformance' element={<KPIMonthly />} />
+        <Route path='/productAdd' element={<ProductAdd />} />
+        <Route path='/add-attendance' element={<AddAttendance />} />
+        <Route path='/kpi' element={<KPI />} />
+      </Routes>
+    </>
+  );
+}
+
 function App() {
   return (
     <div className="App">
-      {/* <Header/> */}
       <Router>
-        <Routes>
-        <Route exact path='/' element={<Home/>}/>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/UserReg' element={<UserReg/>}/>
-          <Route path='/dashboard' element={<Dashboard/>}/>
-          <Route path='/Workeradd' element={<Workeradd/>}/>
-          <Route path='/attendance' element={<Attendance/>}/>
-          <Route path='/workerview' element={<Workerview/>}/>
-          <Route path='/productedit' element={<Productedit/>}/>
-          <Route path='/salarycal' element={<Salarycal/>}/>
-          <Route path='/salaryView' element={<SalaryView/>}/>
-          <Route path='/taskassign' element={<TaskAssign/>}/>
-          <Route path='/taskkpi' element={<TaskKpi/>}/>
-          <Route path='/taskPerformance' element={<TaskPerformance/>}/>
-          <Route path='/productAdd' element={<ProductAdd/>}/>
-          <Route path='/add-attendance' element={<AddAttendance/>}/>
-          <Route path='/kpi' element={<KPI/>}/>
-        
-        </Routes>
+        <AppWrapper />
       </Router>
-      
     </div>
   );
 }

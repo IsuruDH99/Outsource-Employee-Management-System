@@ -68,7 +68,7 @@ const Dashboard = () => {
           <Dropdown>
             <Dropdown.Toggle variant="primary">Manage Work Package</Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item onClick={() => navigate("/kpi")}>Work Manage</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/kpi")}>Assign Work</Dropdown.Item>
               <Dropdown.Item onClick={() => navigate("/taskPerformance")}>View Performance</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
