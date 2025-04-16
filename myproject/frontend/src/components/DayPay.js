@@ -1,41 +1,68 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
+
 const DayPay = () => {
-  // Set initial value (default Rs. 100)
+  const HrID = "HR001"; // You can make this dynamic later
   const [payment, setPayment] = useState(100);
-  const [editValue, setEditValue] = useState(payment);
+  const [editValue, setEditValue] = useState(100);
   const [showPopup, setShowPopup] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
-    // Optional: fetch from backend if needed
-    fetch("http://localhost:3001/daypay")
-      .then((res) => res.json())
+    // Fetch the current payment rate from backend
+    fetch(`http://localhost:3001/daypay/${HrID}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Not found");
+        return res.json();
+      })
       .then((data) => {
-        if (data.paymentPerHour) {
-          setPayment(data.paymentPerHour);
-          setEditValue(data.paymentPerHour);
+        if (data && data.HourlyRate) {
+          setPayment(data.HourlyRate);
+          setEditValue(data.HourlyRate);
         }
       })
       .catch(() => {
-        // fallback to default
         console.warn("Using default payment/hour (Rs. 100)");
+        // Insert default value in backend if no data found
+        fetch("http://localhost:3001/daypay/update", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ HrID, HourlyRate: 100 }),
+        })
+          .then(() => {
+            setPayment(100);
+            setEditValue(100);
+          })
+          .catch((err) => {
+            console.error("Failed to insert default:", err);
+          });
       });
-  }, []);
+  }, [HrID]);
 
   const handleSave = () => {
-    // Update state
-    setPayment(Number(editValue));
+    const newRate = Number(editValue);
+    setPayment(newRate); // Update UI with new value
     setShowPopup(false);
 
-    // Optionally send to backend
+    // Send PUT request to backend to update value
     fetch("http://localhost:3001/daypay/update", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ paymentPerHour: Number(editValue) }),
-    }).catch((err) => {
-      console.error("Failed to update:", err);
-      alert("Failed to update");
-    });
+      body: JSON.stringify({
+        HrID,
+        HourlyRate: newRate,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        console.log("Updated successfully");
+        setSaveMessage("✅ Successfully saved"); // Show success message
+        setTimeout(() => setSaveMessage(""), 3000); // Hide message after 3 sec
+      })
+      .catch((err) => {
+        console.error("Failed to update:", err);
+        alert("Failed to update");
+      });
   };
 
   return (
@@ -48,16 +75,15 @@ const DayPay = () => {
       <div className="grid grid-cols-2 gap-4 items-center text-left">
         <div className="text-lg">Rs. {payment}</div>
         <button
-  onClick={() => setShowPopup(true)}
-  className="flex items-center space-x-2 font-medium text-blue-600 dark:text-blue-400 hover:underline border-2 border-blue-600 rounded-lg px-2 py-1 transform transition-all duration-300 hover:scale-100"
->
-  <FaEdit className="text-lg" />
-  <span>Edit</span>
-</button>
-
+          onClick={() => setShowPopup(true)}
+          className="flex items-center space-x-2 font-medium text-blue-600 hover:underline border-2 border-blue-600 rounded-lg px-2 py-1 transition-all hover:scale-100"
+        >
+          <FaEdit className="text-lg" />
+          <span>Edit</span>
+        </button>
       </div>
 
-      {/* Small edit popup */}
+      {/* Edit Popup */}
       {showPopup && (
         <div className="absolute mt-2 bg-white border border-gray-200 shadow-md rounded-lg p-4 w-64 z-50">
           <h3 className="text-sm font-semibold mb-2">Edit Payment</h3>
@@ -82,6 +108,11 @@ const DayPay = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Success Message */}
+      {saveMessage && (
+        <p className="mt-4 text-green-600 text-sm text-center">{saveMessage}</p>
       )}
     </div>
   );
