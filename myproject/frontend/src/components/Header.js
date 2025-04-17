@@ -89,6 +89,38 @@ const Header = () => {
             </NavLink>
           </li>
 
+          {/* Manage Work Package */}
+          <li className="relative px-3">
+            <div
+              onClick={() => toggleDropdown("work")}
+              className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
+            >
+              Manage Work Package <span className="ml-1 text-xs">▾</span>
+            </div>
+            {openDropdown === "work" && (
+              <ul className="mt-1 bg-white text-black rounded shadow px-3 py-1 space-y-1 absolute z-10 text-sm">
+                <li>
+                  <NavLink
+                    to="/taskassign"
+                    className="font-bold hover:underline"
+                    onClick={closeDropdown}
+                  >
+                    Assign work
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/taskPerformance"
+                    className="font-bold hover:underline"
+                    onClick={closeDropdown}
+                  >
+                    View Performance
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+
           {/* Salary Calculation */}
           <li className="relative px-3">
             <div
@@ -133,38 +165,6 @@ const Header = () => {
             >
               Manage Products
             </NavLink>
-          </li>
-
-          {/* Manage Work Package */}
-          <li className="relative px-3">
-            <div
-              onClick={() => toggleDropdown("work")}
-              className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
-            >
-              Manage Work Package <span className="ml-1 text-xs">▾</span>
-            </div>
-            {openDropdown === "work" && (
-              <ul className="mt-1 bg-white text-black rounded shadow px-3 py-1 space-y-1 absolute z-10 text-sm">
-                <li>
-                  <NavLink
-                    to="/taskassign"
-                    className="font-bold hover:underline"
-                    onClick={closeDropdown}
-                  >
-                    Assign work
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/taskPerformance"
-                    className="font-bold hover:underline"
-                    onClick={closeDropdown}
-                  >
-                    View Performance
-                  </NavLink>
-                </li>
-              </ul>
-            )}
           </li>
         </ul>
       </nav>

@@ -26,6 +26,9 @@ app.use("/salarycal", salarycalRouter);
 const daypayRouter = require('./routes/Daypay');
 app.use("/daypay", daypayRouter);
 
+const productTgtRoute = require('./routes/ProductTgt');
+app.use('/api/producttarget', productTgtRoute);
+
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {
         console.log("Server running on port 3001");

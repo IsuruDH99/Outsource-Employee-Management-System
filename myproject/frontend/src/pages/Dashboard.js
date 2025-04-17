@@ -36,6 +36,20 @@ const Dashboard = () => {
         </div>
       </div>
 
+{/* Performance Tracking Card */}
+<div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Manage Work Package</h5>
+          <img src={kpi} alt="Performance Tracking" className="w-full h-40 object-cover mb-3" />
+          <Dropdown>
+            <Dropdown.Toggle variant="primary">Manage Work Package</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => navigate("/kpi")}>Assign Work</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/taskPerformance")}>View Performance</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </div>
       {/* Salary Calculation Card with Dropdown */}
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
@@ -60,20 +74,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Performance Tracking Card */}
-      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="p-5">
-          <h5 className="mb-2 text-2xl font-bold">Manage Work Package</h5>
-          <img src={kpi} alt="Performance Tracking" className="w-full h-40 object-cover mb-3" />
-          <Dropdown>
-            <Dropdown.Toggle variant="primary">Manage Work Package</Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => navigate("/kpi")}>Assign Work</Dropdown.Item>
-              <Dropdown.Item onClick={() => navigate("/taskPerformance")}>View Performance</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-      </div>
+      
+
     </div>
   );
 };

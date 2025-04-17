@@ -9,6 +9,7 @@ import Productedit from "./pages/Productedit";
 import Salarycal from "./pages/Salarycal";
 import Header from "./components/Header";
 import UserReg from "./pages/UserReg";
+import HourlyTarget from "./pages/HourlyTarget";
 import Home from "./pages/Home";
 import SalaryView from "./pages/SalaryView";
 import TaskAssign from "./pages/TaskAssign";
@@ -31,6 +32,7 @@ function AppWrapper() {
         <Route exact path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/UserReg' element={<UserReg />} />
+        <Route path='/HourlyTarget' element={<HourlyTarget />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/Workeradd' element={<Workeradd />} />
         <Route path='/attendance' element={<Attendance />} />
