@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const TaskAssign = () => {
   const [activeTab, setActiveTab] = useState("Tab1");
@@ -14,8 +15,38 @@ const TaskAssign = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [productList, setProductList] = useState([]);
+  const [employeesList, setEmployeesList] = useState([]);
 
-  const employeesList = ["Alice", "Bob", "Charlie", "David", "Eve"];
+  // Fetch products and employees
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3001/producttarget/product-name"
+        );
+        setProductList(res.data);
+      } catch (err) {
+        console.error("Failed to fetch product targets:", err);
+      }
+    };
+
+    const fetchEmployees = async () => {
+      if (!date) return; // Don't fetch if no date selected
+
+      try {
+        const res = await axios.get(
+          `http://localhost:3001/Employee_attendance_view/get-names?date=${date}`
+        );
+        setEmployeesList(res.data);
+      } catch (err) {
+        console.error("Failed to fetch employees:", err);
+      }
+    };
+
+    fetchProducts();
+    fetchEmployees();
+  }, [date]); // Trigger fetching when 'date' changes
 
   const handleEmployeeSelection = (employee) => {
     setSelectedEmployees((prev) =>
@@ -26,11 +57,27 @@ const TaskAssign = () => {
   };
 
   const calculateTargetTime = () => {
-    const totalTargetTime = (
-      quantity / (target * selectedEmployees.length)
-    ).toFixed(2);
-    setTargetTime(totalTargetTime);
+    if (!quantity || !target || selectedEmployees.length === 0 || !product) {
+      setTargetTime("");
+      return;
+    }
+  
+    // Find the selected product and get its packSize
+    const selected = productList.find((p) => p.productNo === product);
+    const packSize = selected?.packSize; // <-- Make sure this field exists in your DB/API response
+  
+    if (!packSize || target === 0) {
+      setTargetTime("Invalid product or target value");
+      return;
+    }
+  
+    const step1 = quantity / packSize;
+    const step2 = step1 / target;
+    const step3 = step2 / selectedEmployees.length;
+  
+    setTargetTime(step3.toFixed(2));
   };
+  
 
   const handleSave = () => {
     setShowSuccess(true);
@@ -59,13 +106,17 @@ const TaskAssign = () => {
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex gap-4 mb-6">
         <button
-          className={`px-4 py-2 rounded ${activeTab === "Tab1" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+          className={`px-4 py-2 rounded ${
+            activeTab === "Tab1" ? "bg-blue-500 text-white" : "bg-gray-300"
+          }`}
           onClick={() => setActiveTab("Tab1")}
         >
           Task Assign
         </button>
         <button
-          className={`px-4 py-2 rounded ${activeTab === "Tab2" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
+          className={`px-4 py-2 rounded ${
+            activeTab === "Tab2" ? "bg-blue-500 text-white" : "bg-gray-300"
+          }`}
           onClick={() => setActiveTab("Tab2")}
         >
           Daily KPI
@@ -98,11 +149,23 @@ const TaskAssign = () => {
             <select
               className="flex-1 p-2 border rounded"
               value={product}
-              onChange={(e) => setProduct(Number(e.target.value))}
+              onChange={(e) => {
+                const selectedProductNo = e.target.value;
+                const selected = productList.find(
+                  (p) => p.productNo === selectedProductNo
+                );
+                setProduct(selectedProductNo);
+                if (selected) {
+                  setTarget(selected.HourlyTarget);
+                }
+              }}
             >
               <option value="">Select Product</option>
-              <option value="30">P001 30 Box Packing</option>
-              <option value="50">P002 100 Box Packing</option>
+              {productList.map((p) => (
+                <option key={p.productNo} value={p.productNo}>
+                  {p.productNo} - {p.ProductName}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -113,6 +176,7 @@ const TaskAssign = () => {
               value={target}
               onChange={(e) => setTarget(Number(e.target.value))}
               className="flex-1 p-2 border rounded"
+              disabled
             />
           </div>
 
@@ -142,25 +206,30 @@ const TaskAssign = () => {
               {isDropdownOpen && (
                 <div className="absolute z-10 w-full mt-2 border rounded-lg bg-white shadow-lg max-h-60 overflow-y-auto">
                   <div className="space-y-2 p-2">
-                    {employeesList.map((employee) => (
-                      <label
-                        key={employee}
-                        className={`flex items-center p-2 cursor-pointer rounded-lg ${
-                          selectedEmployees.includes(employee)
-                            ? "bg-blue-500 text-white"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          value={employee}
-                          checked={selectedEmployees.includes(employee)}
-                          onChange={() => handleEmployeeSelection(employee)}
-                          className="mr-2"
-                        />
-                        {employee}
-                      </label>
-                    ))}
+                    {employeesList.map((emp) => {
+                      const employeeLabel = `${emp.epf} - ${emp.name}`;
+                      return (
+                        <label
+                          key={emp.epf}
+                          className={`flex items-center p-2 cursor-pointer rounded-lg ${
+                            selectedEmployees.includes(employeeLabel)
+                              ? "bg-blue-500 text-white"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            value={employeeLabel}
+                            checked={selectedEmployees.includes(employeeLabel)}
+                            onChange={() =>
+                              handleEmployeeSelection(employeeLabel)
+                            }
+                            className="mr-2"
+                          />
+                          {employeeLabel}
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -180,7 +249,13 @@ const TaskAssign = () => {
           <div className="mb-4">
             <button
               onClick={() => {
-                if (!date || !product || !target || !quantity || selectedEmployees.length === 0) {
+                if (
+                  !date ||
+                  !product ||
+                  !target ||
+                  !quantity ||
+                  selectedEmployees.length === 0
+                ) {
                   setErrorMessage("⚠️ Please fill in all required fields.");
                   setShowToast(true);
                   setTimeout(() => setShowToast(false), 3000);
@@ -215,187 +290,195 @@ const TaskAssign = () => {
             </button>
             <button
               onClick={handleClear}
-              className="w-1/2 bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
+              className="w-1/2 bg-gray-500 text-white py-2 rounded hover:bg-gray-700"
             >
               Clear
             </button>
           </div>
 
           {showSuccess && (
-            <div className="mt-4 text-green-600 text-center font-medium">
-              ✅ Successfully Saved!
+            <div className="mt-4 p-2 bg-green-100 border border-green-400 text-green-700 rounded">
+              Task Assigned Successfully!
             </div>
           )}
         </div>
       )}
 
-      {activeTab === "Tab2" && (
-        <div className="w-full p-6 bg-white shadow-lg rounded-lg">
-          <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Daily KPI</h2>
+{activeTab === "Tab2" && (
+  <div className="w-full p-6 bg-white shadow-lg rounded-lg">
+    <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Daily KPI</h2>
 
-          <div className="flex justify-center mb-6">
-            <div className="flex flex-col">
-              <label className="font-semibold text-sm text-center">Select Date</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setSavedMessages({});
-                  setSubmitMessage(false);
-                }}
-                max={today}
-                className="border rounded px-3 py-1 w-40 text-sm text-center focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-          </div>
+    <div className="flex justify-center mb-6">
+      <div className="flex flex-col">
+        <label className="font-semibold text-gray-700 text-sm text-center">Select Date</label>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => {
+            setSelectedDate(e.target.value);
+            setSavedMessages({});
+            setSubmitMessage(false);
+          }}
+          max={today}
+          className="border rounded px-3 py-1 w-40 text-sm text-center focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
+    </div>
 
-          <div className="overflow-x-auto">
-            <div className="min-w-[1000px]">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead className="bg-blue-500 text-white">
-                  <tr>
-                    <th className="p-2 border">EPF</th>
-                    <th className="p-2 border">Name</th>
-                    <th className="p-2 border">Product Code</th>
-                    <th className="p-2 border">Product Name</th>
-                    <th className="p-2 border">Target Time</th>
-                    <th className="p-2 border">Actual Time</th>
-                    <th className="p-2 border">KPI</th>
-                    <th className="p-2 border">Actions</th>
+    <div className="overflow-x-auto">
+      <div className="min-w-[1000px]">
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="bg-blue-500 text-white">
+            <tr>
+              <th className="p-2 border">EPF</th>
+              <th className="p-2 border">Name</th>
+              <th className="p-2 border">Product Code</th>
+              <th className="p-2 border">Product Name</th>
+              <th className="p-2 border">Target Time</th>
+              <th className="p-2 border">Actual Time</th>
+              <th className="p-2 border">KPI</th>
+              <th className="p-2 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { epf: 1001, name: "John" },
+              { epf: 1002, name: "Alice" },
+              { epf: 1003, name: "Bob" }
+            ].map((employee) => {
+              const products = [
+                { code: "P001", name: "30 Box Packing" },
+                { code: "P002", name: "100 Box Packing" }
+              ];
+
+              const employeeData = products.map((prod) => {
+                const found = kpiData.find(
+                  (d) => d.epf === employee.epf && d.productCode === prod.code
+                );
+                return {
+                  ...prod,
+                  targetTime: found?.targetTime || 0,
+                  actualTime: found?.actualTime || 0
+                };
+              });
+
+              const totalTarget = employeeData.reduce((sum, p) => sum + p.targetTime, 0);
+              const totalActual = employeeData.reduce((sum, p) => sum + Number(p.actualTime), 0);
+              const dailyKPI = totalActual > 0 ? (totalTarget / totalActual).toFixed(2) : "0.00";
+
+              const handleActualChange = (productIndex, value) => {
+                const product = employeeData[productIndex];
+                const updated = [...kpiData];
+                const index = updated.findIndex(
+                  (d) => d.epf === employee.epf && d.productCode === product.code
+                );
+
+                const newActual = parseFloat(value);
+
+                if (index !== -1) {
+                  updated[index].actualTime = newActual;
+                  updated[index].kpi = (
+                    updated[index].targetTime / newActual
+                  ).toFixed(2);
+                } else {
+                  updated.push({
+                    epf: employee.epf,
+                    name: employee.name,
+                    productCode: product.code,
+                    productName: product.name,
+                    targetTime: product.targetTime,
+                    actualTime: newActual,
+                    kpi: (product.targetTime / newActual).toFixed(2)
+                  });
+                }
+
+                setKpiData(updated);
+              };
+
+              const handleSaveEmployee = () => {
+                // Simulate saving logic
+                setSavedMessages((prev) => ({
+                  ...prev,
+                  [employee.epf]: "Successfully Saved"
+                }));
+              };
+
+              return (
+                <React.Fragment key={employee.epf}>
+                  <tr className="text-center">
+                    <td className="p-2 border" rowSpan={2}>{employee.epf}</td>
+                    <td className="p-2 border" rowSpan={2}>{employee.name}</td>
+                    <td className="p-2 border">{employeeData[0].code}</td>
+                    <td className="p-2 border">{employeeData[0].name}</td>
+                    <td className="p-2 border">{employeeData[0].targetTime} hrs</td>
+                    <td className="p-2 border">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={employeeData[0].actualTime}
+                        onChange={(e) => handleActualChange(0, e.target.value)}
+                        className="border px-2 py-1 text-sm rounded w-20 text-center"
+                      />
+                    </td>
+                    <td className="p-2 border text-green-600" rowSpan={2}>{dailyKPI}</td>
+                    <td className="p-2 border" rowSpan={2}>
+                      <button
+                        onClick={handleSaveEmployee}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Save
+                      </button>
+                      {savedMessages[employee.epf] && (
+                        <div className="text-sm text-green-600 mt-1">
+                          {savedMessages[employee.epf]}
+                        </div>
+                      )}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {[{ epf: 1001, name: "John" }, { epf: 1002, name: "Alice" }, { epf: 1003, name: "Bob" }].map((employee) => {
-                    const products = [
-                      { code: "P001", name: "30 Box Packing" },
-                      { code: "P002", name: "100 Box Packing" }
-                    ];
+                  <tr className="text-center">
+                    <td className="p-2 border">{employeeData[1].code}</td>
+                    <td className="p-2 border">{employeeData[1].name}</td>
+                    <td className="p-2 border">{employeeData[1].targetTime} hrs</td>
+                    <td className="p-2 border">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        value={employeeData[1].actualTime}
+                        onChange={(e) => handleActualChange(1, e.target.value)}
+                        className="border px-2 py-1 text-sm rounded w-20 text-center"
+                      />
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
 
-                    const employeeData = products.map((prod) => {
-                      const found = kpiData.find(
-                        (d) => d.epf === employee.epf && d.productCode === prod.code
-                      );
-                      return {
-                        ...prod,
-                        targetTime: found?.targetTime || 0,
-                        actualTime: found?.actualTime || 0
-                      };
-                    });
+        <div className="mt-6 flex flex-col items-end space-y-2">
+          <button
+            onClick={() => {
+              setSubmitMessage(true);
+              console.log("📤 Submitting all KPI data:", kpiData);
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow"
+          >
+            Submit All
+          </button>
 
-                    const totalTarget = employeeData.reduce((sum, p) => sum + p.targetTime, 0);
-                    const totalActual = employeeData.reduce((sum, p) => sum + Number(p.actualTime), 0);
-                    const dailyKPI = totalActual > 0 ? (totalTarget / totalActual).toFixed(2) : "0.00";
-
-                    const handleActualChange = (productIndex, value) => {
-                      const product = employeeData[productIndex];
-                      const updated = [...kpiData];
-                      const index = updated.findIndex(
-                        (d) => d.epf === employee.epf && d.productCode === product.code
-                      );
-
-                      const newActual = parseFloat(value);
-
-                      if (index !== -1) {
-                        updated[index].actualTime = newActual;
-                        updated[index].kpi = (updated[index].targetTime / newActual).toFixed(2);
-                      } else {
-                        updated.push({
-                          epf: employee.epf,
-                          name: employee.name,
-                          productCode: product.code,
-                          productName: product.name,
-                          targetTime: product.targetTime,
-                          actualTime: newActual,
-                          kpi: (product.targetTime / newActual).toFixed(2)
-                        });
-                      }
-
-                      setKpiData(updated);
-                    };
-
-                    const handleSaveEmployee = () => {
-                      setSavedMessages((prev) => ({
-                        ...prev,
-                        [employee.epf]: "Successfully Saved"
-                      }));
-                    };
-
-                    return (
-                      <React.Fragment key={employee.epf}>
-                        <tr className="text-center">
-                          <td className="p-2 border" rowSpan={2}>{employee.epf}</td>
-                          <td className="p-2 border" rowSpan={2}>{employee.name}</td>
-                          <td className="p-2 border">{employeeData[0].code}</td>
-                          <td className="p-2 border">{employeeData[0].name}</td>
-                          <td className="p-2 border">{employeeData[0].targetTime} hrs</td>
-                          <td className="p-2 border">
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={employeeData[0].actualTime}
-                              onChange={(e) => handleActualChange(0, e.target.value)}
-                              className="border px-2 py-1 text-sm rounded w-20 text-center"
-                            />
-                          </td>
-                          <td className="p-2 border text-green-600" rowSpan={2}>{dailyKPI}</td>
-                          <td className="p-2 border" rowSpan={2}>
-                            <button
-                              onClick={handleSaveEmployee}
-                              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                            >
-                              Save
-                            </button>
-                            {savedMessages[employee.epf] && (
-                              <div className="text-sm text-green-600 mt-1">
-                                {savedMessages[employee.epf]}
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                        <tr className="text-center">
-                          <td className="p-2 border">{employeeData[1].code}</td>
-                          <td className="p-2 border">{employeeData[1].name}</td>
-                          <td className="p-2 border">{employeeData[1].targetTime} hrs</td>
-                          <td className="p-2 border">
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={employeeData[1].actualTime}
-                              onChange={(e) => handleActualChange(1, e.target.value)}
-                              className="border px-2 py-1 text-sm rounded w-20 text-center"
-                            />
-                          </td>
-                        </tr>
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              <div className="mt-6 flex flex-col items-end space-y-2">
-                <button
-                  onClick={() => {
-                    setSubmitMessage(true);
-                    console.log("📤 Submitting all KPI data:", kpiData);
-                  }}
-                  className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded shadow"
-                >
-                  Submit All
-                </button>
-
-                {submitMessage && (
-                  <div className="text-green-700 text-sm font-medium">
-                    ✅ All KPI records submitted for the day!
-                  </div>
-                )}
-              </div>
+          {submitMessage && (
+            <div className="text-green-700 text-sm font-medium">
+              All KPI records submitted for the day!
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

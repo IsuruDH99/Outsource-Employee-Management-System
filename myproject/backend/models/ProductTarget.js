@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    packSize: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     HourlyTarget: {
       type: DataTypes.INTEGER,
       allowNull: false,

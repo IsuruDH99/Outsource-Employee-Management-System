@@ -27,7 +27,10 @@ const daypayRouter = require('./routes/Daypay');
 app.use("/daypay", daypayRouter);
 
 const productTgtRoute = require('./routes/ProductTgt');
-app.use('/api/producttarget', productTgtRoute);
+app.use('/producttarget', productTgtRoute);
+
+const empviewRoute = require('./routes/Employee_attendance_view');
+app.use('/Employee_attendance_view', empviewRoute);
 
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {

@@ -207,12 +207,13 @@ const TaskAssign = () => {
           </div>
 
           <div className="flex gap-4">
-            <button
-              onClick={handleSave}
-              className="w-1/2 bg-blue-500 text-white py-2 rounded hover:bg-green-600"
-            >
-              Save
-            </button>
+          <button
+  onClick={handleSave}
+  className="w-1/2 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+>
+  Save
+</button>
+
             <button
               onClick={handleClear}
               className="w-1/2 bg-gray-400 text-white py-2 rounded hover:bg-gray-500"
@@ -222,8 +223,8 @@ const TaskAssign = () => {
           </div>
 
           {showSuccess && (
-            <div className="mt-4 text-green-600 text-center font-medium">
-              ✅ Successfully Saved!
+            <div className="mt-4 text-blue-600 text-center font-medium">
+               Successfully Saved!
             </div>
           )}
         </div>

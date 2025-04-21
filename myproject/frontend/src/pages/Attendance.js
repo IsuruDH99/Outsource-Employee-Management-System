@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState} from "react"; 
 import axios from "axios";
 
 const Attendance = () => {
@@ -13,11 +13,15 @@ const Attendance = () => {
       alert("Please select both from and to dates.");
       return;
     }
+    if (new Date(fromDate) > new Date(toDate)) {
+      alert("'From' date cannot be later than 'To' date.");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      const response = await axios.get("http://localhost:3001/attendance/get-attendance", {
+      const response = await axios.get("http://localhost:3001/Employee_attendance_view/get-attendance", {
         params: {
           fromDate,
           toDate,
@@ -79,6 +83,7 @@ const Attendance = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-200">
             <tr>
               <th scope="col" className="px-6 py-3">EPF</th>
+              <th scope="col" className="px-6 py-3">Name</th>
               <th scope="col" className="px-6 py-3">Date</th>
               <th scope="col" className="px-6 py-3">In Time</th>
               <th scope="col" className="px-6 py-3">Out Time</th>
@@ -93,6 +98,7 @@ const Attendance = () => {
               attendanceData.map((attendance, index) => (
                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4">{attendance.epf}</td>
+                  <td className="px-6 py-4">{attendance.name}</td>
                   <td className="px-6 py-4">{attendance.date}</td>
                   <td className="px-6 py-4">{attendance.intime}</td>
                   <td className="px-6 py-4">{attendance.outtime}</td>

@@ -4,6 +4,7 @@ const HourlyTarget = () => {
   const [formData, setFormData] = useState({
     productNo: '',
     productName: '',
+    packSize: '',
     targetHourly: '',
   });
   const [submitted, setSubmitted] = useState(false);
@@ -22,12 +23,13 @@ const HourlyTarget = () => {
     setError(null);
 
     try {
-      const res = await fetch('/api/product-target', {
+      const res = await fetch('http://localhost:3001/producttarget/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productNo: formData.productNo,
           productName: formData.productName,
+          packSize: formData.packSize,
           targetHourly: parseInt(formData.targetHourly, 10),
         }),
       });
@@ -44,7 +46,7 @@ const HourlyTarget = () => {
       }
 
       setSubmitted(true);
-      setFormData({ productNo: '', productName: '', targetHourly: '' });
+      setFormData({ productNo: '', productName: '',packSize:'', targetHourly: '' });
     } catch (err) {
       setError(err.message);
       console.error('Submission error:', err);
@@ -72,6 +74,17 @@ const HourlyTarget = () => {
             type="text"
             name="productName"
             value={formData.productName}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Pack Size</label>
+          <input
+            type="number"
+            name="packSize"
+            value={formData.packSize}
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
