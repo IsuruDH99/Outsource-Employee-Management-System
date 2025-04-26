@@ -17,7 +17,7 @@ import TaskKpi from "./pages/TaskKpi";
 import KPIMonthly from "./pages/KPIMonthly";
 import ProductAdd from "./pages/ProductAdd";
 import AddAttendance from "./pages/AddAttendance";
-import KPI from "./pages/KPI";
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -45,7 +45,7 @@ function AppWrapper() {
         <Route path='/taskPerformance' element={<KPIMonthly />} />
         <Route path='/productAdd' element={<ProductAdd />} />
         <Route path='/add-attendance' element={<AddAttendance />} />
-        <Route path='/kpi' element={<KPI />} />
+       
       </Routes>
     </>
   );

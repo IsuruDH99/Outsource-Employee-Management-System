@@ -11,6 +11,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
     ProductName: "",
     price: "",
   });
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,6 +47,8 @@ const Target = ({ setIsEditing, setProductDetails }) => {
       );
       setEditingProduct(null);
       setIsEditing(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000); // auto-hide after 3s
     } catch (error) {
       console.error("Error updating product:", error);
       setError("Failed to update product.");
@@ -58,18 +61,10 @@ const Target = ({ setIsEditing, setProductDetails }) => {
       <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 rounded-lg border-collapse">
         <thead className="text-xs text-gray-700 uppercase bg-gradient-to-r from-blue-500 to-indigo-600 dark:bg-gray-700 dark:text-gray-300">
           <tr>
-            <th scope="col" className="px-6 py-3">
-              Product Code
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Product Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Price
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Actions
-            </th>
+            <th scope="col" className="px-6 py-3">Product Code</th>
+            <th scope="col" className="px-6 py-3">Product Name</th>
+            <th scope="col" className="px-6 py-3">Price</th>
+            <th scope="col" className="px-6 py-3">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -81,12 +76,12 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               >
                 <th
                   scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 dark:text-white"
+                  className="px-6 py-4 font-mediumhigh text-gray-900 dark:text-white"
                 >
                   {product.productNo}
                 </th>
                 <td className="px-6 py-4">{product.ProductName}</td>
-                <td className="px-6 py-4">${product.price}</td>
+                <td className="px-6 py-4">Rs. {product.price}</td>
                 <td className="px-6 py-4 flex space-x-3">
                   <button
                     onClick={() => handleEditClick(product)}
@@ -115,13 +110,23 @@ const Target = ({ setIsEditing, setProductDetails }) => {
             type="text"
             value={updatedProduct.ProductName}
             readOnly
-            onChange={(e) => setUpdatedProduct({ ...updatedProduct, ProductName: e.target.value })}
+            onChange={(e) =>
+              setUpdatedProduct({
+                ...updatedProduct,
+                ProductName: e.target.value,
+              })
+            }
             className="w-full p-2 mt-2 border rounded-lg"
           />
           <input
             type="number"
             value={updatedProduct.price}
-            onChange={(e) => setUpdatedProduct({ ...updatedProduct, price: e.target.value })}
+            onChange={(e) =>
+              setUpdatedProduct({
+                ...updatedProduct,
+                price: e.target.value,
+              })
+            }
             className="w-full p-2 mt-2 border rounded-lg"
           />
           <button
@@ -130,6 +135,12 @@ const Target = ({ setIsEditing, setProductDetails }) => {
           >
             Update Product
           </button>
+        </div>
+      )}
+
+      {showSuccess && (
+        <div className="mt-4 text-blue-600 text-center font-medium">
+          Product rate updated successfully!
         </div>
       )}
     </div>

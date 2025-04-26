@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
       },
-      HourlyRate: {
-        type: DataTypes.STRING,
+      DailyRate: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       }
     });

@@ -2,30 +2,41 @@ const express = require("express");
 const router = express.Router();
 const { Daypay } = require("../models");
 
-// Get HourlyRate by HrID
+// Get DailyRate by HrID
 router.get("/:HrID", async (req, res) => {
   const { HrID } = req.params;
   try {
     const record = await Daypay.findOne({ where: { HrID } });
     if (record) {
-      res.json(record);
+      res.json({
+        HrID: record.HrID,
+        DailyRate: record.DailyRate
+      });
     } else {
-      res.status(404).json({ message: "Not found" });
+      // Return a default rate if not found (you can adjust this as needed)
+      res.json({
+        HrID,
+        DailyRate:0
+      });
     }
   } catch (error) {
-    console.error("Error fetching hourly rate:", error);
+    console.error("Error fetching daily rate:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Update or Insert HourlyRate
+// Update or Insert DailyRate
 router.put("/update", async (req, res) => {
-  const { HrID, HourlyRate } = req.body;
+  const { HrID, DailyRate } = req.body;
   try {
-    const [record, created] = await Daypay.upsert({ HrID, HourlyRate });
-    res.json({ message: created ? "Inserted" : "Updated" });
+    const [record, created] = await Daypay.upsert({ HrID, DailyRate });
+    res.json({ 
+      message: created ? "Inserted" : "Updated",
+      HrID,
+      DailyRate
+    });
   } catch (error) {
-    console.error("Error updating hourly rate:", error);
+    console.error("Error updating daily rate:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

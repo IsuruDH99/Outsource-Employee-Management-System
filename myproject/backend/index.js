@@ -32,6 +32,18 @@ app.use('/producttarget', productTgtRoute);
 const empviewRoute = require('./routes/Employee_attendance_view');
 app.use('/Employee_attendance_view', empviewRoute);
 
+const saldetailsRoute = require('./routes/Salary_details');
+app.use('/Salarydetails', saldetailsRoute);
+
+const salheaderRoute = require('./routes/Salary_headers');
+app.use('/Salaryheaders', salheaderRoute);
+
+const salarydaypayRoute = require('./routes/Salary_Daypay');
+app.use('/Salarydaypay', salarydaypayRoute);
+
+const taskassignRoute = require('./routes/TaskAssign');
+app.use('/TaskAssign', taskassignRoute);
+
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {
         console.log("Server running on port 3001");

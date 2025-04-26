@@ -43,31 +43,31 @@ const ProductEdit = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="w-full max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+    <div className="min-h-screen bg-gray-50 py-2 px-2 pt-3">
+      <div className="w-full max-w-4xl mx-auto bg-white p-1 rounded-lg shadow-md">
+        <h1 className="text-xl font-bold mb-2 text-center text-gray-800 pt-3">
           Product Rate Update
         </h1>
 
         {/* Navbar-like Selection */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="flex justify-center space-x-6">
+        <div className="border-b border-gray-200 mb-2 pt-3 pb-4">
+          <nav className="flex justify-center space-x-3">
             <button
               onClick={() => setSelectedOption("target")}
-              className={`px-6 py-2 font-medium ${
+              className={`px-4 py-2 rounded font-medium text-sm ${
                 selectedOption === "target"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-800 hover:bg-blue-100"
               }`}
             >
               Target
             </button>
             <button
               onClick={() => setSelectedOption("daypay")}
-              className={`px-6 py-2 font-medium ${
+              className={`px-4 py-2 rounded font-medium text-sm ${
                 selectedOption === "daypay"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-800 hover:bg-blue-100"
               }`}
             >
               DayPay

@@ -67,4 +67,37 @@ router.get("/get-names", async (req, res) => {
     }
   });
 
+  router.get("/get-attendance-by-epf", async (req, res) => {
+    const { date, epf } = req.query;
+  
+    if (!date || !epf) {
+      return res.status(400).json({ 
+        error: "Both date and epf parameters are required" 
+      });
+    }
+  
+    try {
+      const attendanceRecord = await Employee_attendance_view.findOne({
+        where: {
+          date,
+          epf
+        },
+        attributes: ["id", "epf", "name", "date", "inTime", "outTime"]
+      });
+  
+      if (!attendanceRecord) {
+        return res.status(404).json({ 
+          error: "Attendance record not found for the selected date and employee" 
+        });
+      }
+  
+      res.json(attendanceRecord);
+    } catch (error) {
+      console.error("Error fetching attendance record:", error);
+      res.status(500).json({ 
+        error: "Internal server error" 
+      });
+    }
+  });
+
 module.exports = router;

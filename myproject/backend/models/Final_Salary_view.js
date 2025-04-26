@@ -1,5 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
-    const Employee_attendance_view = sequelize.define("Employee_attendance_view", {
+  const Final_Salary_view = sequelize.define(
+    "Final_Salary_view",
+    {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -9,28 +11,26 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
-      intime: {
-        type: DataTypes.STRING,
+
+      payment: {
+        type: DataTypes.DOUBLE(10, 2),
         allowNull: false,
       },
-      outtime: {
-        type: DataTypes.STRING,
+
+      totalDailySalary: {
+        type: DataTypes.DOUBLE(10, 2),
         allowNull: false,
       },
     },
     {
-      tableName:"Employee_attendance_view",
-      timestamps:false,
+      tableName: "Final_Salary_view",
+      timestamps: false,
     }
-    );
-  
-    return Employee_attendance_view;
+  );
+
+  return Final_Salary_view;
 };
