@@ -1,25 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const SalaryView = () => {
-  const [selectedMonthYear, setSelectedMonthYear] = useState('');
+  const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [salaryData, setSalaryData] = useState([]);
   const [availableMonths, setAvailableMonths] = useState([]);
 
   useEffect(() => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    const months = [];
+    const currentMonth = currentDate.getMonth(); // 0-based (Jan = 0)
 
-    for (let year = 2020; year <= currentYear; year++) {
-      const endMonth = year === currentYear ? currentMonth : 11;
-      for (let month = 0; month <= endMonth; month++) {
-        const monthYear = `${year}-${(month + 1).toString().padStart(2, '0')}`;
-        months.push(monthYear);
+    const startYear = currentYear - 1; // If December, start from current year, else last year
+    const startMonth = currentMonth; // Next month of current month, if December back to Jan
+
+    const months = [];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    for (let year = startYear; year <= currentYear; year++) {
+      const start = year === startYear ? startMonth : 0;
+      const end = year === currentYear ? currentMonth - 1 : 11;
+      for (let month = start; month <= end; month++) {
+        const formatted = `${year} - ${monthNames[month]}`;
+        months.push(formatted);
       }
     }
+
     setAvailableMonths(months);
-    const initialMonthYear = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`;
+
+    const latestYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const latestMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const initialMonthYear = `${latestYear} - ${monthNames[latestMonth]}`;
     setSelectedMonthYear(initialMonthYear);
     fetchSalaryData(initialMonthYear);
   }, []);
@@ -32,14 +55,20 @@ const SalaryView = () => {
 
   const fetchSalaryData = async (monthYear) => {
     try {
-      setTimeout(() => {
-        const dummyData = [
-          
-        ];
-        setSalaryData(dummyData);
-      }, 500);
+      const response = await fetch(`http://localhost:3001/finalSalary/monthly-salary?monthYear=${monthYear}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch salary data');
+      }
+      console.log(response)
+      const data = await response.json();
+      setSalaryData(data.map(item => ({
+        epfNo: item.epf,
+        monthlySalary: item.monthlySalary
+      })));
+      console.log(salaryData)
     } catch (error) {
-      console.error('Error fetching salary data:', error);
+      console.error("Error fetching salary data:", error);
+      setSalaryData([]); // Clear data on error
     }
   };
 
@@ -53,10 +82,17 @@ const SalaryView = () => {
 
   return (
     <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-4xl mt-10">
-      <h1 className="text-3xl font-bold text-gray-700 mb-6 text-center">Monthly Salary</h1>
+      <h1 className="text-3xl font-bold text-gray-700 mb-6 text-center">
+        Monthly Salary
+      </h1>
 
       <div className="mb-6 flex justify-center">
-        <label htmlFor="monthYear" className="text-lg font-medium text-gray-600 mr-2">Select Month:</label>
+        <label
+          htmlFor="monthYear"
+          className="text-lg font-medium text-gray-600 mr-2"
+        >
+          Select Month:
+        </label>
         <select
           id="monthYear"
           value={selectedMonthYear}
@@ -64,31 +100,39 @@ const SalaryView = () => {
           className="border rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-500"
         >
           {availableMonths.map((monthYear) => (
-            <option key={monthYear} value={monthYear}>{monthYear}</option>
+            <option key={monthYear} value={monthYear}>
+              {monthYear}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-300 shadow-md rounded-lg">
-          <thead>
-            <tr className="bg-blue-500 text-white">
-              <th className="border border-gray-300 p-3 text-left">EPF No</th>
-              <th className="border border-gray-300 p-3 text-left">Name</th>
-              <th className="border border-gray-300 p-3 text-left">Monthly Salary Rs.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salaryData.map((employee, index) => (
-              <tr key={employee.epfNo} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}>
-                <td className="border border-gray-300 p-3">{employee.epfNo}</td>
-                <td className="border border-gray-300 p-3">{employee.name}</td>
-                <td className="border border-gray-300 p-3 font-semibold">{employee.monthlySalary}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table className="w-3/4 mx-auto border-collapse border border-gray-300 shadow-md rounded-lg pt-2">
+    <thead>
+      <tr className="bg-blue-500 text-white">
+        <th className="border border-gray-300 p-1 text-center w-24">EPF No</th>
+        <th className="border border-gray-300 p-1 text-center w-32">Monthly Salary Rs.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {salaryData.map((employee, index) => (
+        <tr
+          key={employee.epfNo}
+          className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+        >
+          <td className="border border-gray-300 p-1">{employee.epfNo}</td>
+          <td className="border border-gray-300 p-1 text-center font-semibold">
+            {employee.monthlySalary}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+
+
 
       <div className="mt-6 flex justify-between">
         <button

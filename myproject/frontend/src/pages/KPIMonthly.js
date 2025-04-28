@@ -1,12 +1,60 @@
-import React, { useState } from "react";
-import { format } from "date-fns";
+import React, { useState, useEffect } from "react";
 
 const KPIMonthly = () => {
-  const currentMonth = format(new Date(), "yyyy-MM");
-  const [selectedDate, setSelectedDate] = useState(currentMonth);
+  const [selectedMonthYear, setSelectedMonthYear] = useState("");
+  const [availableMonths, setAvailableMonths] = useState([]);
+
+  // Sample KPI data
+  const [kpiData, setKpiData] = useState([
+    
+    { epf: "1005", name: "Tom Cruz", kpi: 0.65 },
+  ]);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth(); // 0-based (Jan = 0)
+
+    const startYear = currentYear - 1; // If December, start from current year, else last year
+    const startMonth = currentMonth; // Next month of current month, if December back to Jan
+
+    const months = [];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    for (let year = startYear; year <= currentYear; year++) {
+      const start = year === startYear ? startMonth : 0;
+      const end = year === currentYear ? currentMonth - 1 : 11;
+      for (let month = start; month <= end; month++) {
+        const formatted = `${year} - ${monthNames[month]}`;
+        months.push(formatted);
+      }
+    }
+
+    setAvailableMonths(months);
+
+    const latestYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const latestMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const initialMonthYear = `${latestYear} - ${monthNames[latestMonth]}`;
+    setSelectedMonthYear(initialMonthYear);
+  }, []);
 
   const handleMonthChange = (e) => {
-    setSelectedDate(e.target.value);
+    setSelectedMonthYear(e.target.value);
+    // Here you would typically fetch KPI data for the selected month
+    // For now, we'll just use the sample data
   };
 
   const getGrade = (kpi) => {
@@ -17,14 +65,6 @@ const KPIMonthly = () => {
     return "F";
   };
 
-  const kpiData = [
-    { epf: "1001", name: "John Doe", kpi: 1.25 },
-    { epf: "1002", name: "Jane Smith", kpi: 1.1 },
-    { epf: "1003", name: "Bob Lee", kpi: 0.95 },
-    { epf: "1004", name: "Alice Kim", kpi: 0.8 },
-    { epf: "1005", name: "Tom Cruz", kpi: 0.65 },
-  ];
-
   return (
     <div className="w-full p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Monthly KPI</h2>
@@ -32,14 +72,20 @@ const KPIMonthly = () => {
       {/* Month Picker */}
       <div className="flex justify-center mb-6">
         <div className="flex flex-col">
-          <label className="font-semibold text-gray-700 text-sm text-center mb-1">Select Month</label>
-          <input
-            type="month"
-            value={selectedDate}
+          <label className="font-semibold text-gray-700 text-sm text-center mb-1">
+            Select Month
+          </label>
+          <select
+            value={selectedMonthYear}
             onChange={handleMonthChange}
-            max={currentMonth} // disables future months
             className="border rounded px-3 py-1 w-40 text-sm text-center focus:ring-2 focus:ring-blue-400"
-          />
+          >
+            {availableMonths.map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const Final_Salary_view = sequelize.define(
-    "Final_Salary_view",
+  const Final_salary_view = sequelize.define(
+    "Final_salary_view",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -16,21 +16,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
 
-      payment: {
+      finalSalary: {
         type: DataTypes.DOUBLE(10, 2),
         allowNull: false,
-      },
-
-      totalDailySalary: {
-        type: DataTypes.DOUBLE(10, 2),
-        allowNull: false,
-      },
+      }
     },
     {
-      tableName: "Final_Salary_view",
+      tableName: "Final_salary_view",
       timestamps: false,
     }
   );
 
-  return Final_Salary_view;
+  return Final_salary_view;
 };

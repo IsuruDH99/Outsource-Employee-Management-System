@@ -84,7 +84,7 @@ const Salarycal = () => {
           setInTime(attendanceRes.data.inTime);
           setOutTime(attendanceRes.data.outTime);
           setNormalWorkHours(calculatedHours);
-          console.log('wh',normalWorkHours)
+          console.log("wh", normalWorkHours);
         }
       } catch (err) {
         console.error("Failed to fetch attendance data:", err);
@@ -261,19 +261,16 @@ const Salarycal = () => {
         console.log("Submitting Day Pay data:", paymentData);
       }
 
-      // First create the salary header
-      const headerResponse = await axios.post(
-        "http://localhost:3001/Salaryheaders/add",
-        {
-          date,
-          epf,
-          totalPayment: paymentData.totalPayment,
-        }
-      );
-
-      console.log("Header created:", headerResponse.data);
-
       if (workerType === "Target") {
+        const headerResponse = await axios.post(
+          "http://localhost:3001/Salaryheaders/add",
+          {
+            date,
+            epf,
+            totalPayment: paymentData.totalPayment,
+          }
+        );
+        console.log("Target saved:", headerResponse.data);
         // Save product details
         await Promise.all(
           addedProducts.map((product) =>
@@ -310,12 +307,11 @@ const Salarycal = () => {
       setTotalDailySalary("");
       setInTime("");
       setOutTime("");
-      setNormalWorkHours("");
+      setWorkHours("");
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       resetForm();
-    }
-     catch (error) {
+    } catch (error) {
       console.error("Submission error:", error);
       if (error.response) {
         console.error("Response data:", error.response.data);
@@ -493,7 +489,7 @@ const Salarycal = () => {
                 Normal Work Hours
               </label>
               <div className="p-2 bg-gray-50 rounded">
-                {workHours ? workHours: "N/A"}
+                {workHours ? workHours : "N/A"}
               </div>
             </div>
           </div>
@@ -520,8 +516,8 @@ const Salarycal = () => {
           </div>
         )}
         {selectedEmployee && (
-          <div className="bg-blue-50 rounded-lg pt-1 mb-4 pb-3">
-            <h3 className="font-bold text-center text-blue-800">
+          <div className="bg-blue-50 rounded-lg pt-2 mb-4 pb-3">
+            <h3 className="font-bold text-center text-blue-800 pt-2">
               Total Daily Salary: Rs. {totalDailySalary.toFixed(2)}
             </h3>
           </div>
@@ -577,7 +573,7 @@ const Salarycal = () => {
           ? renderTargetWorkerForm()
           : renderDayPayWorkerForm()}
 
-        <div className="flex justify-between mt-4 mr-20 ml-20">
+        <div className="flex justify-between mt-4 mr-20 ml-20 pt-4">
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded"
             onClick={handleClear}

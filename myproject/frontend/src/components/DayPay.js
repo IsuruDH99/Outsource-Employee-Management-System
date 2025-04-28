@@ -66,7 +66,7 @@ const DayPay = () => {
     <div className="flex justify-center w-full mt-6">
       <div className="p-6 w-full max-w-xl border rounded-lg shadow-sm bg-white">
         <div className="grid grid-cols-2 gap-4 text-xl font-bold border-b pb-3 mb-5 text-left text-blue-600">
-          <div>Payment / hour</div>
+          <div>Daily Payment </div>
           <div>Action</div>
         </div>
 
