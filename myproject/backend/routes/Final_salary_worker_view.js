@@ -22,9 +22,10 @@ router.get("/monthly-salary", async (req, res) => {
     const endDate = new Date(year, monthIndex, 0); // Last day of month
 
     // Query to get monthly salary grouped by EPF and Month
-    const monthlySalaries = await db.Final_salary_view.findAll({
+    const monthlySalaries = await db.Final_salary_worker_view.findAll({
       attributes: [
         'epf',
+        'name',
         [Sequelize.fn('MONTH', Sequelize.col('date')), 'month'],
         [Sequelize.fn('SUM', Sequelize.col('finalSalary')), 'monthlySalary']
       ],
@@ -42,6 +43,7 @@ router.get("/monthly-salary", async (req, res) => {
     });
 
     res.json(monthlySalaries);
+    console.log(monthlySalaries.name)
   } catch (error) {
     console.error("Error fetching monthly salary:", error);
     res.status(500).json({ error: "Failed to fetch monthly salary data" });

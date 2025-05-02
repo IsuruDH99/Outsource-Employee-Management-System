@@ -47,10 +47,10 @@ app.use('/TaskAssign', taskassignRoute);
 const dailykpiRoute = require('./routes/Daily_KPI');
 app.use('/dailykpi', dailykpiRoute);
 
-const kpimonthly_viewRoute = require('./routes/KPImonthly_view');
-app.use('/kpimonthly_view', kpimonthly_viewRoute);
+const kpimonthly_viewRoute = require('./routes/Monthlykpi_worker_view');
+app.use('/kpimonthlyview', kpimonthly_viewRoute);
 
-const finalSalary_viewRoute = require('./routes/Final_Salary_view');
+const finalSalary_viewRoute = require('./routes/Final_salary_worker_view');
 app.use('/finalSalary', finalSalary_viewRoute);
 
 db.sequelize.sync().then(() => {

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const KPImonthly_view = sequelize.define(
-    "KPImonthly_view",
+  const Monthlykpi_worker_view = sequelize.define(
+    "Monthlykpi_worker_view",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       epf: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       productNo: {
@@ -26,10 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "KPImonthly_view",
+      tableName: "Monthlykpi_worker_view",
       timestamps: false,
     }
   );
 
-  return KPImonthly_view;
+  return Monthlykpi_worker_view;
 };

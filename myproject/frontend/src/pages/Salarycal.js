@@ -240,6 +240,7 @@ const Salarycal = () => {
 
     try {
       const epf = selectedEmployee.split(" - ")[0];
+      const name = selectedEmployee.split(" - ")[1];
       let paymentData;
 
       if (workerType === "Target") {

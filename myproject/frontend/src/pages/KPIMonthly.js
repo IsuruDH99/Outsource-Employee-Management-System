@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const KPIMonthly = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [availableMonths, setAvailableMonths] = useState([]);
-
-  // Sample KPI data
-  const [kpiData, setKpiData] = useState([
-    
-    { epf: "1005", name: "Tom Cruz", kpi: 0.65 },
-  ]);
+  const [kpiData, setKpiData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); // 0-based (Jan = 0)
 
-    const startYear = currentYear - 1; // If December, start from current year, else last year
-    const startMonth = currentMonth; // Next month of current month, if December back to Jan
+    const startYear = currentYear - 1;
+    const startMonth = currentMonth;
 
     const months = [];
     const monthNames = [
@@ -38,8 +36,7 @@ const KPIMonthly = () => {
       const start = year === startYear ? startMonth : 0;
       const end = year === currentYear ? currentMonth - 1 : 11;
       for (let month = start; month <= end; month++) {
-        const formatted = `${year} - ${monthNames[month]}`;
-        months.push(formatted);
+        months.push(`${year} - ${monthNames[month]}`);
       }
     }
 
@@ -49,15 +46,35 @@ const KPIMonthly = () => {
     const latestMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const initialMonthYear = `${latestYear} - ${monthNames[latestMonth]}`;
     setSelectedMonthYear(initialMonthYear);
+    fetchKpiData(initialMonthYear);
   }, []);
 
+  const fetchKpiData = async (monthYear) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(
+        `http://localhost:3001/kpimonthlyview/monthly-kpi?monthYear=${monthYear}`
+      );
+      setKpiData(response.data);
+      console.log(kpiData);
+    } catch (err) {
+      console.error("Error fetching KPI data:", err);
+      setError("Failed to load KPI data. Please try again.");
+      setKpiData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleMonthChange = (e) => {
-    setSelectedMonthYear(e.target.value);
-    // Here you would typically fetch KPI data for the selected month
-    // For now, we'll just use the sample data
+    const monthYear = e.target.value;
+    setSelectedMonthYear(monthYear);
+    fetchKpiData(monthYear);
   };
 
   const getGrade = (kpi) => {
+    if (kpi === null || kpi === undefined || isNaN(kpi)) return "N/A";
     if (kpi >= 1.2) return "A";
     if (kpi >= 1.0) return "B";
     if (kpi >= 0.85) return "C";
@@ -65,9 +82,28 @@ const KPIMonthly = () => {
     return "F";
   };
 
+  const getGradeColor = (grade) => {
+    switch (grade) {
+      case "A":
+        return "bg-green-100 text-green-800";
+      case "B":
+        return "bg-blue-100 text-blue-800";
+      case "C":
+        return "bg-yellow-100 text-yellow-800";
+      case "D":
+        return "bg-orange-100 text-orange-800";
+      case "F":
+        return "bg-red-100 text-red-800";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <div className="w-full p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Monthly KPI</h2>
+    <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-4xl mt-10">
+      <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+        Monthly KPI
+      </h2>
 
       {/* Month Picker */}
       <div className="flex justify-center mb-6">
@@ -79,6 +115,7 @@ const KPIMonthly = () => {
             value={selectedMonthYear}
             onChange={handleMonthChange}
             className="border rounded px-3 py-1 w-40 text-sm text-center focus:ring-2 focus:ring-blue-400"
+            disabled={loading}
           >
             {availableMonths.map((month) => (
               <option key={month} value={month}>
@@ -89,34 +126,70 @@ const KPIMonthly = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <div className="min-w-[600px] max-w-4xl mx-auto">
-          <table className="w-full border-collapse border border-gray-300 text-center text-sm">
-            <thead className="bg-blue-500 text-white">
-              <tr>
-                <th className="p-3 border">EPF</th>
-                <th className="p-3 border">Name</th>
-                <th className="p-3 border">KPI (M)</th>
-                <th className="p-3 border">Grade</th>
-              </tr>
-            </thead>
-            <tbody>
-              {kpiData.map((entry) => {
-                const grade = getGrade(entry.kpi);
-                return (
-                  <tr key={entry.epf} className="hover:bg-gray-50">
-                    <td className="p-3 border">{entry.epf}</td>
-                    <td className="p-3 border">{entry.name}</td>
-                    <td className="p-3 border">{entry.kpi.toFixed(2)}</td>
-                    <td className="p-3 border font-semibold">{grade}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* Status Messages */}
+      {loading && (
+        <div className="text-center py-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-2 text-gray-600">Loading KPI data...</p>
         </div>
-      </div>
+      )}
+
+      {error && (
+        <div
+          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
+          role="alert"
+        >
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* Table */}
+      {!loading && !error && (
+        <div className="overflow-x-auto">
+          <div className="min-w-[600px] max-w-4xl mx-auto">
+            <table className="w-full border-collapse border border-gray-300 text-center text-sm">
+              <thead className="bg-blue-500 text-white">
+                <tr>
+                  <th className="p-3 border">EPF</th>
+                  <th className="p-3 border">Name</th>
+                  <th className="p-3 border">KPI (M)</th>
+                  <th className="p-3 border">Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                {kpiData.length > 0 ? (
+                  kpiData.map((entry) => {
+                    const grade = getGrade(entry.kpi);
+                    const gradeColor = getGradeColor(grade);
+                    return (
+                      <tr key={entry.epf} className="hover:bg-gray-50">
+                        <td className="p-3 border">{entry.epf}</td>
+                        <td className="p-3 border">{entry.name}</td>
+                        <td className="p-3 border">
+                          {entry.kpi !== null && !isNaN(entry.kpi)
+                            ? entry.kpi.toFixed(2)
+                            : "N/A"}
+                        </td>
+                        <td
+                          className={`p-3 border font-semibold ${gradeColor} rounded`}
+                        >
+                          {grade}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="p-4 text-gray-500 text-center">
+                      No KPI data available for selected month
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

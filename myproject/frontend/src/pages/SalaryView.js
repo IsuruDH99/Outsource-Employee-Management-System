@@ -59,10 +59,10 @@ const SalaryView = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch salary data');
       }
-      console.log(response)
       const data = await response.json();
       setSalaryData(data.map(item => ({
         epfNo: item.epf,
+        name: item.name,
         monthlySalary: item.monthlySalary
       })));
       console.log(salaryData)
@@ -112,6 +112,7 @@ const SalaryView = () => {
     <thead>
       <tr className="bg-blue-500 text-white">
         <th className="border border-gray-300 p-1 text-center w-24">EPF No</th>
+        <th className="border border-gray-300 p-1 text-center w-24">Employee Name</th>
         <th className="border border-gray-300 p-1 text-center w-32">Monthly Salary Rs.</th>
       </tr>
     </thead>
@@ -121,7 +122,8 @@ const SalaryView = () => {
           key={employee.epfNo}
           className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
         >
-          <td className="border border-gray-300 p-1">{employee.epfNo}</td>
+          <td className="border border-gray-300 p-1 text-center">{employee.epfNo}</td>
+          <td className="border border-gray-300 p-1 text-center">{employee.name}</td>
           <td className="border border-gray-300 p-1 text-center font-semibold">
             {employee.monthlySalary}
           </td>
@@ -137,13 +139,13 @@ const SalaryView = () => {
       <div className="mt-6 flex justify-between">
         <button
           onClick={handlePrint}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ml-40"
         >
           Print
         </button>
         <button
           onClick={handleBack}
-          className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300"
+          className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 mr-40"
         >
           Back
         </button>
