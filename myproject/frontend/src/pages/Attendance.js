@@ -1,12 +1,17 @@
-import React, { useState} from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const Attendance = () => {
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const currentDate = new Date().toISOString().split("T")[0];
+  const [fromDate, setFromDate] = useState(currentDate);
+  const [toDate, setToDate] = useState(currentDate);
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const currentDate = new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    // Fetch attendance data for current date when component mounts
+    handleFetchAttendance();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleFetchAttendance = async () => {
     if (!fromDate || !toDate) {
@@ -21,12 +26,15 @@ const Attendance = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get("http://localhost:3001/Employee_attendance_view/get-attendance", {
-        params: {
-          fromDate,
-          toDate,
-        },
-      });
+      const response = await axios.get(
+        "http://localhost:3001/Employee_attendance_view/get-attendance",
+        {
+          params: {
+            fromDate,
+            toDate,
+          },
+        }
+      );
 
       setAttendanceData(response.data);
     } catch (error) {
@@ -43,7 +51,6 @@ const Attendance = () => {
         <h1 className="text-4xl font-bold tracking-wide text-gray-800 ">
           Attendance
         </h1>
-        <p className="text-gray-500 text-sm mt-1">Track employee in/out records by date</p>
       </div>
 
       {/* Date Input Section */}
@@ -78,35 +85,49 @@ const Attendance = () => {
       </div>
 
       {/* Table Section */}
-      <div className="relative overflow-x-auto bg-white rounded-lg shadow-md">
+      <div className="relative overflow-x-auto bg-white rounded-lg shadow-md mx-auto w-11/12 max-w-4xl">
         <table className="w-full text-sm text-left text-gray-600">
           <thead className="text-xs text-gray-700 uppercase bg-gray-200">
             <tr>
-              <th scope="col" className="px-6 py-3">EPF</th>
-              <th scope="col" className="px-6 py-3">Name</th>
-              <th scope="col" className="px-6 py-3">Date</th>
-              <th scope="col" className="px-6 py-3">In Time</th>
-              <th scope="col" className="px-6 py-3">Out Time</th>
+              <th scope="col" className="px-6 py-3">
+                Date
+              </th>
+              <th scope="col" className="px-6 py-3">
+                EPF
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Name
+              </th>
+              <th scope="col" className="px-6 py-3">
+                In Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Out Time
+              </th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">Loading...</td>
+                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  Loading...
+                </td>
               </tr>
             ) : attendanceData.length > 0 ? (
               attendanceData.map((attendance, index) => (
                 <tr key={index} className="bg-white border-b hover:bg-gray-50">
+                  <td className="px-6 py-4">{attendance.date}</td>
                   <td className="px-6 py-4">{attendance.epf}</td>
                   <td className="px-6 py-4">{attendance.name}</td>
-                  <td className="px-6 py-4">{attendance.date}</td>
                   <td className="px-6 py-4">{attendance.intime}</td>
                   <td className="px-6 py-4">{attendance.outtime}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No data available</td>
+                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  No data available
+                </td>
               </tr>
             )}
           </tbody>

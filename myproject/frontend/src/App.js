@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
-import { useState } from "react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Workeradd from "./pages/Workeradd";
@@ -17,7 +16,6 @@ import TaskKpi from "./pages/TaskKpi";
 import KPIMonthly from "./pages/KPIMonthly";
 import ProductAdd from "./pages/ProductAdd";
 import AddAttendance from "./pages/AddAttendance";
-
 
 function AppWrapper() {
   const location = useLocation();
@@ -43,9 +41,8 @@ function AppWrapper() {
         <Route path='/taskassign' element={<TaskAssign />} />
         <Route path='/taskkpi' element={<TaskKpi />} />
         <Route path='/taskPerformance' element={<KPIMonthly />} />
-        <Route path='/productAdd' element={<ProductAdd />} />
         <Route path='/add-attendance' element={<AddAttendance />} />
-       
+        <Route path='/productAdd' element={<ProductAdd />} />
       </Routes>
     </>
   );

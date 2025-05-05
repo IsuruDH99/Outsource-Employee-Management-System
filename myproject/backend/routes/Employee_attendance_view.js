@@ -45,6 +45,32 @@ router.get("/get-attendance", async (req, res) => {
 });
 
 router.get("/get-names", async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: "Date parameter is required" });
+  }
+
+  try {
+    const attendanceDetails = await Employee_attendance_view.findAll({
+      where: {
+        date: date,
+        status: {
+          [Op.or]: ["just-attend", "Target"] // This will match either status
+        }
+      },
+      attributes: ["epf", "name", "status"], // Include status in the response
+      group: ["epf", "name", "status"], // Add status to group by
+    });
+
+    res.json(attendanceDetails);
+  } catch (error) {
+    console.error("Error fetching attendance:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+  router.get("/get-names-target", async (req, res) => {
     const { date } = req.query;
   
     if (!date) {
@@ -54,10 +80,37 @@ router.get("/get-names", async (req, res) => {
     try {
       const attendanceDetails = await Employee_attendance_view.findAll({
         where: {
-          date: date, // Replace 'date' with the correct column name if different
+          date: date,
+          status:"Target"
         },
-        attributes: ["epf", "name"],
-        group: ["epf", "name"],
+        attributes: ["epf", "name", "status"],
+        group: ["epf", "name", "status"],
+      });
+  
+      res.json(attendanceDetails);
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  router.get("/get-names-daypay", async (req, res) => {
+    const { date } = req.query;
+  
+    if (!date) {
+      return res.status(400).json({ error: "Date parameter is required" });
+    }
+  
+    try {
+      const attendanceDetails = await Employee_attendance_view.findAll({
+        where: {
+          date: date,
+          status: {
+            [Op.or]: ["just-attend"] // This will match either status
+          }
+        },
+        attributes: ["epf", "name", "status"], // Include status in the response
+        group: ["epf", "name", "status"], // Add status to group by
       });
   
       res.json(attendanceDetails);
@@ -82,7 +135,7 @@ router.get("/get-names", async (req, res) => {
           date,
           epf
         },
-        attributes: ["id", "epf", "name", "date", "inTime", "outTime"]
+        attributes: ["id", "epf", "name", "date", "inTime", "outTime","status"]
       });
   
       if (!attendanceRecord) {
@@ -99,5 +152,7 @@ router.get("/get-names", async (req, res) => {
       });
     }
   });
+
+
 
 module.exports = router;

@@ -32,7 +32,7 @@ const TaskAssign = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3001/producttarget/product-name"
+          "http://localhost:3001/target/product-name"
         );
         setProductList(res.data);
       } catch (err) {
@@ -102,7 +102,7 @@ const TaskAssign = () => {
       setTimeout(() => setShowToast(false), 3000);
       return;
     }
-
+  
     try {
       const epf = selectedEmployee.split(" - ")[0];
       const payload = {
@@ -113,8 +113,17 @@ const TaskAssign = () => {
         targetQuantity: parseInt(quantity),
         targetTimeHrs: parseFloat(targetTime),
       };
+      
+      // First save the task assignment
       await axios.post("http://localhost:3001/TaskAssign/assign-task", payload);
-
+  
+      // Then update the attendance status to "Target"
+      await axios.put("http://localhost:3001/attendance/update-status", {
+        date,
+        epf: parseInt(epf),
+        status: "Target"
+      });
+  
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       handleClear();

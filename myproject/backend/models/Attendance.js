@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     outtime: {
       type: DataTypes.STRING,
       allowNull: false,
-    }
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   });
 
   return Attendance;

@@ -35,24 +35,29 @@ const Salarycal = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, employeesRes] = await Promise.all([
+        const [productsRes] = await Promise.all([
           axios.get("http://localhost:3001/target/get-products"),
-          date
-            ? axios.get(
-                `http://localhost:3001/Employee_attendance_view/get-names?date=${date}`
-              )
-            : Promise.resolve({ data: [] }),
         ]);
 
         setProductList(productsRes.data);
-        setEmployeesList(employeesRes.data || []);
+
+        // Only fetch employees if date is selected
+        if (date) {
+          const endpoint =
+            workerType === "Target"
+              ? `http://localhost:3001/Employee_attendance_view/get-names-target?date=${date}`
+              : `http://localhost:3001/Employee_attendance_view/get-names-daypay?date=${date}`;
+
+          const employeesRes = await axios.get(endpoint);
+          setEmployeesList(employeesRes.data || []);
+        }
       } catch (err) {
         console.error("Failed to fetch data:", err);
       }
     };
 
     fetchData();
-  }, [date]);
+  }, [date, workerType]); // Add workerType to dependency array
 
   // Fetch attendance data and daily rate when employee is selected
   useEffect(() => {
@@ -71,20 +76,17 @@ const Salarycal = () => {
         setAttendanceData(attendanceRes.data);
         const rate = rateRes.data?.DailyRate || 0;
         setDailyRate(rate);
-        setOvertimeRate(rate / 9); // Calculate overtime rate as DailyRate/9
+        setOvertimeRate(rate / 9);
 
         if (attendanceRes.data?.inTime && attendanceRes.data?.outTime) {
           const calculatedHours = calculateWorkHours(
-            calculateWorkHours(
-              attendanceRes.data.inTime,
-              attendanceRes.data.outTime
-            )
+            attendanceRes.data.inTime,
+            attendanceRes.data.outTime
           );
           setWorkHours(calculatedHours);
           setInTime(attendanceRes.data.inTime);
           setOutTime(attendanceRes.data.outTime);
           setNormalWorkHours(calculatedHours);
-          console.log("wh", normalWorkHours);
         }
       } catch (err) {
         console.error("Failed to fetch attendance data:", err);
@@ -94,7 +96,7 @@ const Salarycal = () => {
     };
 
     fetchAttendanceAndRate();
-  }, [date, selectedEmployee]);
+  }, [date, selectedEmployee, workerType]);
 
   // Helper functions
   const calculateWorkHours = (inTime, outTime) => {
@@ -242,14 +244,15 @@ const Salarycal = () => {
       const epf = selectedEmployee.split(" - ")[0];
       const name = selectedEmployee.split(" - ")[1];
       let paymentData;
+      let statusToUpdate = "";
 
       if (workerType === "Target") {
         paymentData = {
           type: "Target",
           totalPayment: addedProducts.reduce((sum, p) => sum + p.payment, 0),
         };
+        statusToUpdate = "Target-salary-added";
       } else {
-        // For Day Pay workers, ensure calculations are complete
         paymentData = {
           type: "Day Pay",
           totalPayment: totalDailySalary,
@@ -258,10 +261,10 @@ const Salarycal = () => {
           overtimeSalary,
           totalDailySalary,
         };
-
-        console.log("Submitting Day Pay data:", paymentData);
+        statusToUpdate = "Daypay-salary-added";
       }
 
+      // First save the salary data
       if (workerType === "Target") {
         const headerResponse = await axios.post(
           "http://localhost:3001/Salaryheaders/add",
@@ -271,8 +274,7 @@ const Salarycal = () => {
             totalPayment: paymentData.totalPayment,
           }
         );
-        console.log("Target saved:", headerResponse.data);
-        // Save product details
+
         await Promise.all(
           addedProducts.map((product) =>
             axios.post("http://localhost:3001/Salarydetails/add", {
@@ -285,8 +287,7 @@ const Salarycal = () => {
             })
           )
         );
-      } else if (workerType === "Day Pay") {
-        // Save day pay details
+      } else {
         const daypayResponse = await axios.post(
           "http://localhost:3001/Salarydaypay/add",
           {
@@ -298,8 +299,16 @@ const Salarycal = () => {
             totalDailySalary,
           }
         );
-        console.log("Day Pay saved:", daypayResponse.data);
       }
+
+      // Then update the attendance status
+      await axios.put("http://localhost:3001/attendance/update-status-td", {
+        date,
+        epf,
+        status: statusToUpdate,
+      });
+
+      // Reset form and show success
       setDate("");
       setSelectedEmployee("");
       setDailySalary("");
@@ -314,11 +323,6 @@ const Salarycal = () => {
       resetForm();
     } catch (error) {
       console.error("Submission error:", error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-      }
       showError(error.message || "Failed to submit salary. Please try again.");
     }
   };

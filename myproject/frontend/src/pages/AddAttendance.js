@@ -22,7 +22,13 @@ const AddAttendance = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3001/attendance/add-attendance', formData); // adjust URL if needed
+      // Create the data to send with the additional status field
+      const dataToSend = {
+        ...formData,
+        status: 'just-attend'  // Adding the default status
+      };
+
+      const response = await axios.post('http://localhost:3001/attendance/add-attendance', dataToSend);
       if (response.data.success) {
         setStatus('Attendance added successfully.');
         setFormData({
@@ -45,20 +51,19 @@ const AddAttendance = () => {
       <h2 className="text-xl font-bold mb-4">Add Attendance</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
+          type="date"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
           type="text"
           name="epf"
           value={formData.epf}
           onChange={handleChange}
           placeholder="EPF Number"
-          className="w-full p-2 border rounded"
-          required
-        />
-
-        <input
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
