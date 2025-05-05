@@ -17,7 +17,7 @@ const Header = () => {
 
   const handleLogout = () => {
     // Add your logout logic here (clear tokens, etc.)
-    navigate('/'); // Navigate to home page
+    navigate("/"); // Navigate to home page
   };
 
   // Close dropdown when clicking outside
@@ -36,13 +36,17 @@ const Header = () => {
     <header className="bg-blue-700 text-white shadow-md">
       <nav className="w-full px-6 py-3" ref={navRef}>
         <div className="flex items-center">
-          <ul className="flex space-x-6"> {/* Increased space between nav items */}
+          <ul className="flex space-x-24">
+            {" "}
+            {/* Increased space between nav items */}
             <li className="relative">
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
                   `text-base font-semibold leading-normal tracking-wide transition duration-200 ${
-                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
+                    isActive
+                      ? "text-gray-300"
+                      : "text-white hover:text-gray-400"
                   }`
                 }
                 style={{ textDecoration: "none" }}
@@ -50,7 +54,6 @@ const Header = () => {
                 Dashboard
               </NavLink>
             </li>
-
             {/* Manage Employee */}
             <li className="relative">
               <div
@@ -82,13 +85,14 @@ const Header = () => {
                 </ul>
               )}
             </li>
-
             <li className="relative">
               <NavLink
                 to="/attendance"
                 className={({ isActive }) =>
                   `text-base font-semibold leading-normal tracking-wide transition duration-200 ${
-                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
+                    isActive
+                      ? "text-gray-300"
+                      : "text-white hover:text-gray-400"
                   }`
                 }
                 style={{ textDecoration: "none" }}
@@ -96,7 +100,6 @@ const Header = () => {
                 View Attendance
               </NavLink>
             </li>
-
             {/* Manage Work Package */}
             <li className="relative">
               <div
@@ -128,7 +131,6 @@ const Header = () => {
                 </ul>
               )}
             </li>
-
             {/* Salary Calculation */}
             <li className="relative">
               <div
@@ -160,7 +162,6 @@ const Header = () => {
                 </ul>
               )}
             </li>
-
             {/* Manage Products */}
             <li className="relative">
               <div
@@ -192,16 +193,17 @@ const Header = () => {
                 </ul>
               )}
             </li>
+            <li>
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="text-white pt-1 hover:text-gray-300 transition duration-200 flex items-center"
+                title="Logout"
+              >
+                <FiLogOut className="text-xl" />
+              </button>
+            </li>
           </ul>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="text-white hover:text-gray-300 transition duration-200 flex items-center"
-            title="Logout"
-          >
-            <FiLogOut className="text-xl" />
-          </button>
         </div>
       </nav>
     </header>

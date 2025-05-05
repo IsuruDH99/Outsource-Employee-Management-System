@@ -46,7 +46,7 @@ const ProductAdd = () => {
           <p className="text-center text-sm text-red-600 mb-4">{message}</p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-bold text-1xl">
           {/* Form Row Template */}
           {[
             { id: "productNo", label: "Product No", value: productNo, setter: setproductNo },
@@ -56,7 +56,7 @@ const ProductAdd = () => {
             { id: "hourlyTarget", label: "Hourly Target", value: hourlyTarget, setter: sethourlyTarget },
           ].map(({ id, label, value, setter }) => (
             <div key={id} className="grid grid-cols-3 items-center gap-4">
-              <label htmlFor={id} className="text-sm font-medium text-gray-700">
+              <label htmlFor={id} className="text-m font-medium text-gray-700">
                 {label}
               </label>
               <input
