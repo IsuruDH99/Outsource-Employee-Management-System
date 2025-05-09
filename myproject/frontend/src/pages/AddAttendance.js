@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddAttendance = () => {
   const [formData, setFormData] = useState({
@@ -8,8 +10,6 @@ const AddAttendance = () => {
     intime: '',
     outtime: '',
   });
-
-  const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -22,15 +22,14 @@ const AddAttendance = () => {
     e.preventDefault();
 
     try {
-      // Create the data to send with the additional status field
       const dataToSend = {
         ...formData,
-        status: 'just-attend'  // Adding the default status
+        status: 'just-attend',
       };
 
       const response = await axios.post('http://localhost:3001/attendance/add-attendance', dataToSend);
       if (response.data.success) {
-        setStatus('Attendance added successfully.');
+        toast.success('Attendance added successfully.');
         setFormData({
           epf: '',
           date: '',
@@ -38,11 +37,11 @@ const AddAttendance = () => {
           outtime: '',
         });
       } else {
-        setStatus('Failed to add attendance.');
+        toast.error('Failed to add attendance.');
       }
     } catch (error) {
       console.error(error);
-      setStatus('Error adding attendance.');
+      toast.error('Error adding attendance.');
     }
   };
 
@@ -67,7 +66,6 @@ const AddAttendance = () => {
           className="w-full p-2 border rounded"
           required
         />
-
         <input
           type="time"
           name="intime"
@@ -76,7 +74,6 @@ const AddAttendance = () => {
           className="w-full p-2 border rounded"
           required
         />
-
         <input
           type="time"
           name="outtime"
@@ -85,13 +82,23 @@ const AddAttendance = () => {
           className="w-full p-2 border rounded"
           required
         />
-
         <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
           Submit
         </button>
       </form>
 
-      {status && <p className="mt-4 text-center text-sm text-gray-700">{status}</p>}
+      {/* Toast container for showing messages */}
+      <ToastContainer
+        position="top-center"
+        autoClose={1200}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ marginTop: '65px' }}
+      />
     </div>
   );
 };

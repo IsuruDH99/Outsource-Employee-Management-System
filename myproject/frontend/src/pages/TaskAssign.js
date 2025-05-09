@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TaskAssign = () => {
   const [activeTab, setActiveTab] = useState("Task Assign");
@@ -12,7 +14,6 @@ const TaskAssign = () => {
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [targetTime, setTargetTime] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [productList, setProductList] = useState([]);
@@ -124,14 +125,21 @@ const TaskAssign = () => {
         status: "Target"
       });
   
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      toast.success("Successfully Assigned!", {
+        position: "top-center",
+        autoClose: 1200,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       handleClear();
     } catch (error) {
       console.error("Error saving task:", error);
       setErrorMessage("⚠️ Failed to save task. Please try again.");
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => setShowToast(false), 1200);
     }
   };
 
@@ -183,6 +191,8 @@ const TaskAssign = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      <ToastContainer />
+      
       <div className="flex gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded ${
@@ -212,12 +222,12 @@ const TaskAssign = () => {
 
       {activeTab === "Task Assign" && (
         <div className="p-6 w-full max-w-2xl mx-auto border rounded-lg shadow-lg">
-          <h2 className="text-xl text-center font-bold mb-6">
-            TaskAssign - Assign Work
+          <h2 className="text-2xl text-center font-bold mb-6">
+             Assign Task 
           </h2>
 
-          <div className="flex items-center mb-4 gap-4 ml-16">
-            <label className="w-48">Select Date : </label>
+          <div className="flex items-center mb-4 gap-4 ml-16 text-black">
+            <label className="w-48">Select Date  </label>
             <div className="relative w-48">
               <input
                 type="date"
@@ -229,13 +239,13 @@ const TaskAssign = () => {
             </div>
           </div>
 
-          <div className="flex items-center mb-4 gap-4 ml-16">
-            <label className="w-48">Select Employee:</label>
+          <div className="flex items-center mb-4 gap-4 ml-16 text-black">
+            <label className="w-48">Select Employee</label>
             <div className="relative w-48">
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full p-2 border rounded bg-gray-100 text-left"
+                className="w-full p-2 border rounded bg-gray-50 text-left"
               >
                 {selectedEmployee || "Select Employee"}
               </button>
@@ -268,10 +278,10 @@ const TaskAssign = () => {
             </div>
           </div>
 
-          <div className="flex items-center mb-4 gap-4 ml-16">
-            <label className="w-48">Product :</label>
+          <div className="flex items-center mb-4 gap-4 ml-16 text-black">
+            <label className="w-48">Product </label>
             <select
-              className="flex-1 p-2 border rounded"
+              className="flex-1 p-2 border rounded text-gray-600"
               value={product}
               onChange={(e) => {
                 const selectedProductNo = e.target.value;
@@ -294,7 +304,7 @@ const TaskAssign = () => {
             </select>
           </div>
 
-          <div className="flex items-center mb-4 gap-4 ml-16">
+          <div className="flex items-center mb-4 gap-4 ml-16 text-black">
             <label className="w-48">Target (Per Hr/Per Person)</label>
             <input
               type="number"
@@ -360,17 +370,11 @@ const TaskAssign = () => {
 
             <button
               onClick={handleSave}
-              className="w-1/2 bg-blue-500 text-white py-2 rounded hover:bg-green-500"
+              className="w-1/2 bg-blue-500 text-white py-2 rounded hover:bg-indigo-500"
             >
               Save
             </button>
           </div>
-
-          {showSuccess && (
-            <div className="mt-4 text-blue-600 text-center font-medium">
-              Successfully Saved!
-            </div>
-          )}
         </div>
       )}
 

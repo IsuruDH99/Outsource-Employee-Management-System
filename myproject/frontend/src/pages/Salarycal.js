@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Salarycal = () => {
   // State management
@@ -14,9 +16,6 @@ const Salarycal = () => {
   const [productList, setProductList] = useState([]);
   const [employeesList, setEmployeesList] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
   const [addedProducts, setAddedProducts] = useState([]);
   const [totalPayment, setTotalPayment] = useState(0);
   const [overtimeRate, setOvertimeRate] = useState(0);
@@ -30,6 +29,31 @@ const Salarycal = () => {
 
   // Constants
   const HrID = "HR001";
+
+  // Toast notification functions
+  const showSuccess = (message) => {
+    toast.success(message, {
+      position: "top-center",
+      autoClose: 1200,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const showError = (message) => {
+    toast.error(message, {
+      position: "top-center",
+      autoClose: 1200,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   // Fetch data on component mount and when date changes
   useEffect(() => {
@@ -53,11 +77,12 @@ const Salarycal = () => {
         }
       } catch (err) {
         console.error("Failed to fetch data:", err);
+        showError("Failed to fetch data. Please try again.");
       }
     };
 
     fetchData();
-  }, [date, workerType]); // Add workerType to dependency array
+  }, [date, workerType]);
 
   // Fetch attendance data and daily rate when employee is selected
   useEffect(() => {
@@ -92,6 +117,7 @@ const Salarycal = () => {
         console.error("Failed to fetch attendance data:", err);
         setDailyRate(0);
         setOvertimeRate(0);
+        showError("Failed to fetch attendance data. Please try again.");
       }
     };
 
@@ -105,14 +131,6 @@ const Salarycal = () => {
     if (outDate < inDate) outDate.setDate(outDate.getDate() + 1);
     return (outDate - inDate) / (1000 * 60 * 60);
   };
-
-  // const calculateDayPay = () => {
-  //   if (!dailyRate || !workHours) return 0;
-  //   const hours = parseFloat(workHours);
-  //   if (hours >= 9 && hours <= 9.5) return dailyRate;
-  //   if (hours >= 4.5 && hours <= 5) return dailyRate / 2;
-  //   return 0;
-  // };
 
   const handleAddProduct = () => {
     if (!date || !selectedEmployee || !product || !quantity) {
@@ -318,19 +336,12 @@ const Salarycal = () => {
       setInTime("");
       setOutTime("");
       setWorkHours("");
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      showSuccess("Successfully Saved!");
       resetForm();
     } catch (error) {
       console.error("Submission error:", error);
       showError(error.message || "Failed to submit salary. Please try again.");
     }
-  };
-
-  const showError = (message) => {
-    setErrorMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
   };
 
   const resetForm = () => {
@@ -343,13 +354,13 @@ const Salarycal = () => {
   const handleClear = () => {
     setDate("");
     resetForm();
-    setErrorMessage("");
-    setShowToast(false);
   };
+
   useEffect(() => {
     const total = addedProducts.reduce((sum, p) => sum + p.payment, 0);
     setTotalPayment(total);
   }, [addedProducts]);
+
   const renderEmployeeDropdown = () => (
     <div className="flex items-center mb-4 gap-4 ml-16">
       <label className="w-48">Select Employee:</label>
@@ -483,18 +494,18 @@ const Salarycal = () => {
           <div className="mb-4 grid grid-cols-3 gap-3">
             <div>
               <label className="block mb-1 text-sm font-medium">In Time</label>
-              <div className="p-2 bg-gray-50 rounded">{inTime || "N/A"}</div>
+              <div className="p-2 bg-gray-50 rounded">{inTime || "0"}</div>
             </div>
             <div>
               <label className="block mb-1 text-sm font-medium">Out Time</label>
-              <div className="p-2 bg-gray-50 rounded">{outTime || "N/A"}</div>
+              <div className="p-2 bg-gray-50 rounded">{outTime || "0"}</div>
             </div>
             <div>
               <label className="block mb-1 text-sm font-medium">
                 Normal Work Hours
               </label>
               <div className="p-2 bg-gray-50 rounded">
-                {workHours ? workHours : "N/A"}
+                {workHours ? workHours : "0"}
               </div>
             </div>
           </div>
@@ -530,8 +541,21 @@ const Salarycal = () => {
       </>
     );
   };
+
   return (
     <div className="flex justify-center pb-40 pt-12 bg-gray-100">
+      <ToastContainer 
+        position="top-center"
+        autoClose={1200}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ marginTop: "65px" }}
+      />
+      
       <div className="w-full max-w-3xl bg-white pl-4 pr-4 pt-4 pb-24 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-center">
           Salary Calculator
@@ -586,24 +610,12 @@ const Salarycal = () => {
             Clear
           </button>
           <button
-            className="bg-blue-500 hover:bg-green-500 text-white px-4 py-2 rounded transition-colors duration-200"
+            className="bg-blue-500 hover:bg-indigo-500 text-white px-4 py-2 rounded transition-colors duration-200"
             onClick={handleSubmit}
           >
             Submit
           </button>
         </div>
-
-        {showSuccess && (
-          <div className="mt-4 text-green-600 text-center font-medium">
-            Successfully Saved!
-          </div>
-        )}
-
-        {showToast && (
-          <div className="mt-4 pt-1 bg-red-100 border border-red-400 text-red-700 rounded shadow-md">
-            {errorMessage}
-          </div>
-        )}
       </div>
     </div>
   );

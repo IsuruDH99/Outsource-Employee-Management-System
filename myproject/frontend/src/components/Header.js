@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiLogOut } from "react-icons/fi"; // Import logout icon from react-icons
+import { FiLogOut } from "react-icons/fi";
 
 const Header = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [selectedMenu, setSelectedMenu] = useState(null); // <- Track clicked menu
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navRef = useRef(null);
   const navigate = useNavigate();
 
   const toggleDropdown = (menu) => {
-    setOpenDropdown(openDropdown === menu ? null : menu);
+    const isSameMenu = openDropdown === menu;
+    setOpenDropdown(isSameMenu ? null : menu);
+    setSelectedMenu(isSameMenu ? null : menu); // <- Highlight clicked menu
   };
 
   const closeDropdown = () => {
@@ -16,50 +21,55 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // Add your logout logic here (clear tokens, etc.)
-    navigate("/"); // Navigate to home page
+    setShowLogoutModal(true);
   };
 
-  // Close dropdown when clicking outside
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      setShowSuccess(false);
+      navigate("/"); // Navigate to home page
+    }, 0);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target)) {
         closeDropdown();
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const menuStyle = (menu) =>
+    `font-medium text-base cursor-pointer flex items-center transition ${
+      selectedMenu === menu ? "text-gray-300" : "text-white hover:text-gray-400"
+    }`;
+
   return (
-    <header className="bg-blue-700 text-white shadow-md">
+    <header className="bg-blue-700 text-white shadow-md relative z-20">
       <nav className="w-full px-6 py-3" ref={navRef}>
         <div className="flex items-center">
           <ul className="flex space-x-24">
-            {" "}
-            {/* Increased space between nav items */}
             <li className="relative">
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
-                  `text-base font-semibold leading-normal tracking-wide transition duration-200 ${
-                    isActive
-                      ? "text-gray-300"
-                      : "text-white hover:text-gray-400"
+                  `text-base font-semibold transition duration-200 no-underline ${
+                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
                   }`
                 }
-                style={{ textDecoration: "none" }}
               >
                 Dashboard
               </NavLink>
             </li>
+
             {/* Manage Employee */}
             <li className="relative">
-              <div
-                onClick={() => toggleDropdown("employee")}
-                className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
-              >
+              <div onClick={() => toggleDropdown("employee")} className={menuStyle("employee")}>
                 Manage Employee <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "employee" && (
@@ -85,27 +95,23 @@ const Header = () => {
                 </ul>
               )}
             </li>
+
             <li className="relative">
               <NavLink
                 to="/attendance"
                 className={({ isActive }) =>
-                  `text-base font-semibold leading-normal tracking-wide transition duration-200 ${
-                    isActive
-                      ? "text-gray-300"
-                      : "text-white hover:text-gray-400"
+                  `text-base font-semibold transition duration-200 no-underline ${
+                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
                   }`
                 }
-                style={{ textDecoration: "none" }}
               >
                 View Attendance
               </NavLink>
             </li>
+
             {/* Manage Work Package */}
             <li className="relative">
-              <div
-                onClick={() => toggleDropdown("work")}
-                className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
-              >
+              <div onClick={() => toggleDropdown("work")} className={menuStyle("work")}>
                 Manage Work Package <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "work" && (
@@ -131,12 +137,10 @@ const Header = () => {
                 </ul>
               )}
             </li>
+
             {/* Salary Calculation */}
             <li className="relative">
-              <div
-                onClick={() => toggleDropdown("salary")}
-                className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
-              >
+              <div onClick={() => toggleDropdown("salary")} className={menuStyle("salary")}>
                 Salary Calculation <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "salary" && (
@@ -162,12 +166,10 @@ const Header = () => {
                 </ul>
               )}
             </li>
+
             {/* Manage Products */}
             <li className="relative">
-              <div
-                onClick={() => toggleDropdown("manage")}
-                className="font-medium text-base hover:text-gray-300 cursor-pointer flex items-center"
-              >
+              <div onClick={() => toggleDropdown("manage")} className={menuStyle("manage")}>
                 Manage Products <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "manage" && (
@@ -193,8 +195,9 @@ const Header = () => {
                 </ul>
               )}
             </li>
+
+            {/* Logout Button */}
             <li>
-              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="text-white pt-1 hover:text-gray-300 transition duration-200 flex items-center"
@@ -206,6 +209,39 @@ const Header = () => {
           </ul>
         </div>
       </nav>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-md w-80 text-center">
+            <h2 className="text-base font-semibold mb-2">Confirm Logout</h2>
+            <p className="text-sm text-gray-700 mb-4">
+              Are you sure you want to logout?
+            </p>
+            <div className="flex justify-center space-x-1">
+              <button
+                className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400 text-sm"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                onClick={confirmLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {showSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-md z-50">
+          Successfully logged out.
+        </div>
+      )}
     </header>
   );
 };

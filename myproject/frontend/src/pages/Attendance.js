@@ -45,18 +45,18 @@ const Attendance = () => {
   };
 
   return (
-    <div className="pt-4 p-6 bg-gray-100 min-h-screen">
+    <div className="pt-4 p-6 bg-gray-100 min-h-screen ">
       {/* Styled Title */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold tracking-wide text-gray-800 ">
+      <div className="text-center mb-8 ">
+        <h1 className="text-4xl font-bold tracking-wide text-gray-900 ">
           Attendance
         </h1>
       </div>
 
       {/* Date Input Section */}
-      <div className="flex flex-wrap justify-center items-end gap-4 mb-6">
-        <div className="flex flex-col">
-          <label className="text-sm text-gray-700 mb-1">From:</label>
+      <div className="flex  justify-center items-end gap-16 mb-6">
+        <div className=" flex-row">
+          <label className="text-sm text-black mb-1 pr-3 ">From:</label>
           <input
             type="date"
             className="border p-2 rounded w-40"
@@ -65,8 +65,8 @@ const Attendance = () => {
             max={currentDate}
           />
         </div>
-        <div className="flex flex-col">
-          <label className="text-sm text-gray-700 mb-1">To:</label>
+        <div className=" flex-row">
+          <label className="text-sm text-black mb-1 pr-3">To:</label>
           <input
             type="date"
             className="border p-2 rounded w-40"
@@ -85,9 +85,9 @@ const Attendance = () => {
       </div>
 
       {/* Table Section */}
-      <div className="relative overflow-x-auto bg-white rounded-lg shadow-md mx-auto w-11/12 max-w-4xl">
+      <div className="relative overflow-x-auto bg-white rounded-lg shadow-md mx-auto w-11/12 max-w-4xl ">
         <table className="w-full text-sm text-left text-gray-600">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-200">
+          <thead className="text-sm text-black uppercase bg-gray-200 bg-gradient-to-r from-blue-500 to-indigo-400">
             <tr>
               <th scope="col" className="px-6 py-3">
                 Date

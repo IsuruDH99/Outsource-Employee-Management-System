@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductAdd = () => {
   const [productNo, setproductNo] = useState("");
@@ -8,7 +10,6 @@ const ProductAdd = () => {
   const [price, setprice] = useState("");
   const [packSize, setpackSize] = useState("");
   const [hourlyTarget, sethourlyTarget] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -24,7 +25,7 @@ const ProductAdd = () => {
       });
 
       if (response.status === 201) {
-        setMessage("Product added successfully!");
+        toast.success("Product added successfully!");
         setproductNo("");
         setProductName("");
         setprice("");
@@ -32,22 +33,21 @@ const ProductAdd = () => {
         sethourlyTarget("");
       }
     } catch (error) {
-      setMessage("Error adding product.");
+      toast.error("Error adding product.");
       console.error(error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 pt-2">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl relative">
+
+        {/* Toast container */}
+        <ToastContainer position="top-center" autoClose={1200} hideProgressBar={false} newestOnTop={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover style={{ marginTop: "65px" }} />
+
         <h2 className="text-3xl font-bold mb-6 text-blue-600 text-center">Add Products</h2>
 
-        {message && (
-          <p className="text-center text-sm text-red-600 mb-4">{message}</p>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4 text-bold text-1xl">
-          {/* Form Row Template */}
           {[
             { id: "productNo", label: "Product No", value: productNo, setter: setproductNo },
             { id: "ProductName", label: "Product Name", value: ProductName, setter: setProductName },

@@ -99,15 +99,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Manage Products Card
-      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="p-5">
-          <h5 className="mb-2 text-2xl font-bold">Manage Products</h5>
-          <img src={product} alt="Manage Products" className="w-full h-40 object-cover mb-3" />
-          <Button onClick={() => navigate("/productedit")}>Manage Products</Button>
-        </div>
-      </div> */}
-
       {/* Manage Product Card with Dropdown */}
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">

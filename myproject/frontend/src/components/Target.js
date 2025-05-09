@@ -4,7 +4,7 @@ import axios from "axios";
 import Modal from "react-modal";
 
 // Make sure to bind modal to your appElement
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
 const Target = ({ setIsEditing, setProductDetails }) => {
   const [products, setProducts] = useState([]);
@@ -15,7 +15,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
     ProductName: "",
     price: "",
     packSize: "",
-    hourlyTarget: ""
+    hourlyTarget: "",
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -67,7 +67,9 @@ const Target = ({ setIsEditing, setProductDetails }) => {
       await axios.delete(
         `http://localhost:3001/target/delete-product/${updatedProduct.productNo}`
       );
-      setProducts(products.filter(p => p.productNo !== updatedProduct.productNo));
+      setProducts(
+        products.filter((p) => p.productNo !== updatedProduct.productNo)
+      );
       setIsModalOpen(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -79,37 +81,50 @@ const Target = ({ setIsEditing, setProductDetails }) => {
 
   const modalStyles = {
     content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      width: '50%',
-      maxWidth: '600px',
-      borderRadius: '0.5rem',
-      backgroundColor: '#f8fafc',
-      border: 'none',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      width: "50%",
+      maxWidth: "600px",
+      borderRadius: "0.5rem",
+      backgroundColor: "#f8fafc",
+      border: "none",
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
     },
     overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      zIndex: 1000
-    }
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      zIndex: 1000,
+    },
   };
 
   return (
     <div className="relative overflow-x-auto shadow-lg sm:rounded-lg bg-white dark:bg-gray-800 p-6">
       {error && <p className="text-red-500">{error}</p>}
-      <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 rounded-lg border-collapse">
-        <thead className="text-xs text-gray-700 uppercase bg-gradient-to-r from-blue-400 to-indigo-600 dark:bg-gray-700 dark:text-gray-300">
+      <table className="w-full text-base text-left text-black  rounded-lg border-collapse">
+        <thead className="text-base text-gray-700  bg-gradient-to-r from-blue-500 to-indigo-400 dark:bg-gray-600 dark:text-gray-300">
           <tr>
-            <th scope="col" className="px-6 py-3">Product Code</th>
-            <th scope="col" className="px-6 py-3">Product Name</th>
-            <th scope="col" className="px-6 py-3">Rate</th>
-            <th scope="col" className="px-6 py-3">Pack Size</th>
-            <th scope="col" className="px-6 py-3">Hourly Target</th>
-            <th scope="col" className="px-6 py-3">Actions</th>
+            <th scope="col" className="px-6 py-3">
+              Product Code
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Product Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Rate
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Pack Size
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Hourly Target
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -121,14 +136,14 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               >
                 <th
                   scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 dark:text-white"
+                  className="px-6 py-4 font-medium text-black dark:text-white"
                 >
                   {product.productNo}
                 </th>
                 <td className="px-6 py-4">{product.ProductName}</td>
                 <td className="px-6 py-4">Rs. {product.price}</td>
-                <td className="px-6 py-4">{product.packSize}</td>
-                <td className="px-6 py-4">{product.hourlyTarget}</td>
+                <td className="px-6 py-4 text-center">{product.packSize}</td>
+                <td className="px-6 py-4 text-center">{product.hourlyTarget}</td>
                 <td className="px-6 py-4 flex space-x-3">
                   <button
                     onClick={() => handleEditClick(product)}
@@ -161,8 +176,10 @@ const Target = ({ setIsEditing, setProductDetails }) => {
         contentLabel="Edit Product Modal"
       >
         <div className="p-4">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Edit Product</h2>
-          
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            Edit Product
+          </h2>
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Product Code</label>
             <input
@@ -172,7 +189,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               className="w-full p-2 border rounded-lg bg-gray-100"
             />
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Product Name</label>
             <input
@@ -182,7 +199,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               className="w-full p-2 border rounded-lg bg-gray-100"
             />
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Price (Rs.)</label>
             <input
@@ -197,7 +214,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               className="w-full p-2 border rounded-lg"
             />
           </div>
-          
+
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Pack Size</label>
             <input
@@ -207,7 +224,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               className="w-full p-2 border rounded-lg bg-gray-100"
             />
           </div>
-          
+
           <div className="mb-6">
             <label className="block text-gray-700 mb-2">Hourly Target</label>
             <input
@@ -222,7 +239,7 @@ const Target = ({ setIsEditing, setProductDetails }) => {
               className="w-full p-2 border rounded-lg"
             />
           </div>
-          
+
           <div className="flex justify-between">
             <div>
               {!deleteConfirm ? (
@@ -235,7 +252,9 @@ const Target = ({ setIsEditing, setProductDetails }) => {
                 </button>
               ) : (
                 <div className="space-x-2">
-                  <span className="text-red-600 font-medium">Are you sure?</span>
+                  <span className="text-red-600 font-medium">
+                    Are you sure?
+                  </span>
                   <button
                     onClick={handleDelete}
                     className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
@@ -251,25 +270,27 @@ const Target = ({ setIsEditing, setProductDetails }) => {
                 </div>
               )}
             </div>
-            
-            <div className="space-x-2">
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setIsEditing(false);
-                  setDeleteConfirm(false);
-                }}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Update Product
-              </button>
-            </div>
+
+            {!deleteConfirm && (
+              <div className="space-x-2">
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setIsEditing(false);
+                    setDeleteConfirm(false);
+                  }}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdate}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Update Product
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </Modal>

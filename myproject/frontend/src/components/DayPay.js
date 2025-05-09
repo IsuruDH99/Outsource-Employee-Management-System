@@ -80,16 +80,16 @@ const DayPay = () => {
   return (
     <div className="flex justify-center w-full mt-6">
       <div className="p-6 w-full max-w-xl border rounded-lg shadow-sm bg-white">
-        <div className="grid grid-cols-2 gap-4 text-xl font-bold border-b pb-3 mb-5 text-left text-blue-500">
+        <div className="grid grid-cols-2 gap-4 text-xl font-bold border-b pb-3 pt-3 pl-2 mb-5 text-center text-black bg-gradient-to-r from-blue-500 to-indigo-400">
           <div>Daily Payment</div>
           <div>Action</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 items-center text-left text-lg">
+        <div className="grid grid-cols-2 gap-32 items-center text-center text-lg">
           <div>Rs. {payment}</div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center space-x-2 font-medium text-blue-600 hover:underline border-2 border-blue-600 rounded-lg px-3 py-2 transition-all hover:bg-blue-50"
+            className="flex items-center space-x-2 font-medium w-40  text-blue-600 hover:underline border-2 border-blue-600 rounded-lg px-2 py-1 transition-all hover:bg-blue-50"
           >
             <FaEdit className="text-xl" />
             <span>Edit</span>
