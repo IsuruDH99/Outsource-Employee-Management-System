@@ -17,7 +17,7 @@ const Login = () => {
         email,
         password,
       });
-
+      localStorage.setItem("accessToken", response.data.token);
       if (response.status === 200) {
         setMessage("Login successful!");
         navigate("/dashboard");

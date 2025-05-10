@@ -31,6 +31,7 @@ router.post("/assign-task", async (req, res) => {
       productName,
       targetQuantity,
       targetTimeHrs,
+      status: "task-assigned",
     });
 
     res
@@ -38,6 +39,31 @@ router.post("/assign-task", async (req, res) => {
       .json({ message: "Task Assigned Successfully", task: newTask });
   } catch (error) {
     console.error("Error assigning task:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Update Task Status
+router.put("/update-task-status", async (req, res) => {
+  try {
+    const { taskId, status } = req.body;
+    
+    if (!taskId || !status) {
+      return res.status(400).json({ error: "Task ID and status are required." });
+    }
+
+    const updated = await TaskAssign.update(
+      { status },
+      { where: { id: taskId } }
+    );
+
+    if (updated[0] === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.status(200).json({ message: "Task status updated successfully" });
+  } catch (error) {
+    console.error("Error updating task status:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -50,7 +76,7 @@ router.get("/get-tasks", async (req, res) => {
     }
 
     const tasks = await TaskAssign.findAll({
-      where: { date, epf},
+      where: { date, epf, status:"task-assigned"},
     });
 
     // Format the response to include employee name

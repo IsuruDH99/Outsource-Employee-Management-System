@@ -1,40 +1,45 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SalaryView = () => {
+  const navigate = useNavigate();
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [salaryData, setSalaryData] = useState([]);
   const [availableMonths, setAvailableMonths] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Check authentication on component mount
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Please login first");
+      navigate('/login');
+    } else {
+      initializeMonthSelection();
+    }
+  }, [navigate]);
+
+  const initializeMonthSelection = () => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth(); // 0-based (Jan = 0)
+    const currentMonth = currentDate.getMonth();
 
-    const startYear = currentYear - 1; // If December, start from current year, else last year
-    const startMonth = currentMonth; // Next month of current month, if December back to Jan
+    const startYear = currentYear - 1;
+    const startMonth = currentMonth;
 
     const months = [];
     const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
 
     for (let year = startYear; year <= currentYear; year++) {
       const start = year === startYear ? startMonth : 0;
       const end = year === currentYear ? currentMonth - 1 : 11;
       for (let month = start; month <= end; month++) {
-        const formatted = `${year} - ${monthNames[month]}`;
-        months.push(formatted);
+        months.push(`${year} - ${monthNames[month]}`);
       }
     }
 
@@ -45,7 +50,7 @@ const SalaryView = () => {
     const initialMonthYear = `${latestYear} - ${monthNames[latestMonth]}`;
     setSelectedMonthYear(initialMonthYear);
     fetchSalaryData(initialMonthYear);
-  }, []);
+  };
 
   const handleMonthYearChange = (event) => {
     const selectedValue = event.target.value;
@@ -54,21 +59,48 @@ const SalaryView = () => {
   };
 
   const fetchSalaryData = async (monthYear) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Session expired. Please login again.");
+      navigate('/login');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/finalSalary/monthly-salary?monthYear=${monthYear}`);
+      const response = await fetch(
+        `http://localhost:3001/finalSalary/monthly-salary?monthYear=${monthYear}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized');
+        }
         throw new Error('Failed to fetch salary data');
       }
+
       const data = await response.json();
       setSalaryData(data.map(item => ({
         epfNo: item.epf,
         name: item.name,
         monthlySalary: item.monthlySalary
       })));
-      console.log(salaryData)
     } catch (error) {
       console.error("Error fetching salary data:", error);
-      setSalaryData([]); // Clear data on error
+      if (error.message === 'Unauthorized') {
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      } else {
+        toast.error("Failed to load salary data");
+      }
+      setSalaryData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,7 +109,7 @@ const SalaryView = () => {
   };
 
   const handleBack = () => {
-    window.history.back();
+    navigate(-1); // Better than window.history.back()
   };
 
   return (

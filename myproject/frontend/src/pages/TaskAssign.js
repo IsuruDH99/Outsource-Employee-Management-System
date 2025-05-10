@@ -154,40 +154,56 @@ const TaskAssign = () => {
     setShowToast(false);
   };
 
-  const saveKpiData = async (task) => {
-    try {
-      const epf = selectedEmployee.split(" - ")[0];
-      const found = kpiData.find(
-        (d) => d.productCode === task.productNo && d.taskId === task.id
-      );
+const saveKpiData = async (task) => {
+  try {
+    const epf = selectedEmployee.split(" - ")[0];
+    const found = kpiData.find(
+      (d) => d.productCode === task.productNo && d.taskId === task.id
+    );
 
-      if (!found || !found.actualTime) {
-        setErrorMessage("⚠️ Please enter actual time before saving.");
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-        return;
-      }
-
-      const payload = {
-        date: selectedDate,
-        epf: parseInt(epf),
-        productNo: task.productNo,
-        ActualTime: parseFloat(found.actualTime),
-        kpi: parseFloat(found.kpi),
-      };
-
-      await axios.post("http://localhost:3001/dailykpi/save-kpi", payload);
-      setSavedMessages((prev) => ({
-        ...prev,
-        [`${task.id}-${task.productNo}`]: true,
-      }));
-    } catch (error) {
-      console.error("Error saving KPI data:", error);
-      setErrorMessage("⚠️ Failed to save KPI data. Please try again.");
+    if (!found || !found.actualTime) {
+      setErrorMessage("⚠️ Please enter actual time before saving.");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
+      return;
     }
-  };
+
+    const payload = {
+      date: selectedDate,
+      epf: parseInt(epf),
+      productNo: task.productNo,
+      ActualTime: parseFloat(found.actualTime),
+      kpi: parseFloat(found.kpi),
+    };
+
+    // First save the KPI data
+    await axios.post("http://localhost:3001/dailykpi/save-kpi", payload);
+    
+    // Then update the TaskAssign status to "kpi-added"
+    await axios.put("http://localhost:3001/TaskAssign/update-task-status", {
+      taskId: task.id,
+      status: "kpi-added"
+    });
+
+    // Finally update the Daily_KPI status to "completed"
+    await axios.put("http://localhost:3001/dailykpi/update-status", {
+      date: selectedDate,
+      epf: parseInt(epf),
+      productNo: task.productNo,
+      status: "completed"
+    });
+
+    setSavedMessages((prev) => ({
+      ...prev,
+      [`${task.id}-${task.productNo}`]: true,
+    }));
+  } catch (error) {
+    console.error("Error saving KPI data:", error);
+    setErrorMessage("⚠️ Failed to save KPI data. Please try again.");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  }
+};
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -585,6 +601,7 @@ const TaskAssign = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

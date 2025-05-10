@@ -12,7 +12,6 @@ import HourlyTarget from "./pages/HourlyTarget";
 import Home from "./pages/Home";
 import SalaryView from "./pages/SalaryView";
 import TaskAssign from "./pages/TaskAssign";
-import TaskKpi from "./pages/TaskKpi";
 import KPIMonthly from "./pages/KPIMonthly";
 import ProductAdd from "./pages/ProductAdd";
 import AddAttendance from "./pages/AddAttendance";
@@ -39,7 +38,6 @@ function AppWrapper() {
         <Route path='/salarycal' element={<Salarycal />} />
         <Route path='/salaryView' element={<SalaryView />} />
         <Route path='/taskassign' element={<TaskAssign />} />
-        <Route path='/taskkpi' element={<TaskKpi />} />
         <Route path='/taskPerformance' element={<KPIMonthly />} />
         <Route path='/add-attendance' element={<AddAttendance />} />
         <Route path='/productAdd' element={<ProductAdd />} />

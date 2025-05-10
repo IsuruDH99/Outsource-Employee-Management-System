@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const KPIMonthly = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
@@ -7,29 +8,31 @@ const KPIMonthly = () => {
   const [kpiData, setKpiData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
+  // Check authentication on component mount
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Please login first');
+      navigate('/login');
+    } else {
+      initializeMonthSelection();
+    }
+  }, [navigate]);
+
+  const initializeMonthSelection = () => {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth(); // 0-based (Jan = 0)
+    const currentMonth = currentDate.getMonth();
 
     const startYear = currentYear - 1;
     const startMonth = currentMonth;
 
     const months = [];
     const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
 
     for (let year = startYear; year <= currentYear; year++) {
@@ -47,20 +50,38 @@ const KPIMonthly = () => {
     const initialMonthYear = `${latestYear} - ${monthNames[latestMonth]}`;
     setSelectedMonthYear(initialMonthYear);
     fetchKpiData(initialMonthYear);
-  }, []);
+  };
 
-  const fetchKpiData = async (monthYear) => {
+const fetchKpiData = async (monthYear) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Session expired. Please login again.');
+      navigate('/login');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       const response = await axios.get(
-        `http://localhost:3001/kpimonthlyview/monthly-kpi?monthYear=${monthYear}`
+        `http://localhost:3001/kpimonthlyview/monthly-kpi?monthYear=${monthYear}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       setKpiData(response.data);
-      console.log(kpiData);
     } catch (err) {
       console.error("Error fetching KPI data:", err);
-      setError("Failed to load KPI data. Please try again.");
+      
+      if (err.response?.status === 401) {
+        alert('Session expired. Please login again.');
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.message || "Failed to load KPI data. Please try again.");
+      }
       setKpiData([]);
     } finally {
       setLoading(false);

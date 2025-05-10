@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -10,19 +10,45 @@ const ProductAdd = () => {
   const [price, setprice] = useState("");
   const [packSize, setpackSize] = useState("");
   const [hourlyTarget, sethourlyTarget] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Please login first");
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Session expired. Please login again.");
+      navigate('/login');
+      return;
+    }
 
     try {
-      const response = await axios.post("http://localhost:3001/target/add-products", {
-        productNo,
-        ProductName,
-        price,
-        packSize,
-        hourlyTarget,
-      });
+      const response = await axios.post(
+        "http://localhost:3001/target/add-products",
+        {
+          productNo,
+          ProductName,
+          price,
+          packSize,
+          hourlyTarget,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Product added successfully!");
@@ -33,8 +59,16 @@ const ProductAdd = () => {
         sethourlyTarget("");
       }
     } catch (error) {
-      toast.error("Error adding product.");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      } else {
+        toast.error(error.response?.data?.message || "Error adding product.");
+      }
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 

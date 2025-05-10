@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HourlyTarget = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,16 @@ const HourlyTarget = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Please login first');
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,14 +29,24 @@ const HourlyTarget = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('Session expired. Please login again.');
+      navigate('/login');
+      return;
+    }
 
     try {
       const res = await fetch('http://localhost:3001/producttarget/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           productNo: formData.productNo,
           productName: formData.productName,
@@ -34,20 +55,27 @@ const HourlyTarget = () => {
         }),
       });
 
-      // log raw text on error to debug
       if (!res.ok) {
-        const text = await res.text();
-        console.error('Server response:', text);
-        let msg = 'Failed to save';
-        try {
-          msg = JSON.parse(text).message || msg;
-        } catch {}
-        throw new Error(msg);
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to save');
       }
 
       setSubmitted(true);
-      setFormData({ productNo: '', productName: '',packSize:'', targetHourly: '' });
+      setFormData({ 
+        productNo: '', 
+        productName: '',
+        packSize: '', 
+        targetHourly: '' 
+      });
+      
+      // Reset submission status after 3 seconds
+      setTimeout(() => setSubmitted(false), 3000);
+      
     } catch (err) {
+      if (err.message === 'Unauthorized' || err.message === 'Invalid token') {
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      }
       setError(err.message);
       console.error('Submission error:', err);
     }

@@ -1,47 +1,83 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const AddAttendance = () => {
   const [formData, setFormData] = useState({
-    epf: '',
-    date: '',
-    intime: '',
-    outtime: '',
+    epf: "",
+    date: "",
+    intime: "",
+    outtime: "",
   });
-
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      toast.error("Please login first");
+      navigate("/login"); // Redirect to login if no token
+    }
+  }, [navigate]);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+        return;
+      }
+
       const dataToSend = {
         ...formData,
-        status: 'just-attend',
+        status: "just-attend",
       };
 
-      const response = await axios.post('http://localhost:3001/attendance/add-attendance', dataToSend);
+      const response = await axios.post(
+        "http://localhost:3001/attendance/add-attendance",
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (response.data.success) {
-        toast.success('Attendance added successfully.');
+        toast.success("Attendance added successfully.");
         setFormData({
-          epf: '',
-          date: '',
-          intime: '',
-          outtime: '',
+          epf: "",
+          date: "",
+          intime: "",
+          outtime: "",
         });
       } else {
-        toast.error('Failed to add attendance.');
+        toast.error(response.data.message || "Failed to add attendance.");
       }
     } catch (error) {
-      console.error(error);
-      toast.error('Error adding attendance.');
+      if (error.response) {
+        // Handle different HTTP status codes
+        if (error.response.status === 401) {
+          toast.error("Session expired. Please login again.");
+          localStorage.removeItem("accessToken");
+          navigate("/login");
+        } else if (error.response.status === 409) {
+          toast.error("Attendance record already exists.");
+        } else {
+          toast.error(error.response.data.message || "An error occurred");
+        }
+      } else {
+        console.error(error);
+        toast.error("Network error. Please try again.");
+      }
     }
   };
 
@@ -82,7 +118,10 @@ const AddAttendance = () => {
           className="w-full p-2 border rounded"
           required
         />
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        >
           Submit
         </button>
       </form>
@@ -97,7 +136,7 @@ const AddAttendance = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        style={{ marginTop: '65px' }}
+        style={{ marginTop: "65px" }}
       />
     </div>
   );

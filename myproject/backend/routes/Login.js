@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { Login } = require("../models");
+const { sign } = require("jsonwebtoken");
+const { validateToken } = require("../middlewares/AuthMiddleware");
+const bcrypt = require("bcrypt");
 
 // User registration endpoint
 router.post("/", async (req, res) => {
@@ -11,7 +14,11 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    await Login.create({ email, password });
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await Login.create({ email, password: hashedPassword });
 
     res.status(201).json({ message: "User registered successfully!" });
   } catch (error) {
@@ -30,15 +37,34 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (user.password !== password) {
+    // Compare hashed password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    res.status(200).json({ message: "Login successful" });
+    // Create JWT token
+    const accessToken = sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || "importantsecret",
+      { expiresIn: "24h" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token: accessToken,
+      user: { id: user.id, email: user.email }
+    });
+
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Server error" });
   }
+});
+
+// Protected route example
+router.get("/profile", validateToken, (req, res) => {
+  res.json({ user: req.user });
 });
 
 module.exports = router;

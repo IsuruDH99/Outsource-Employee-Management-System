@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Target from "../components/Target";
 import DayPay from "../components/DayPay";
 import { ToastContainer, toast } from "react-toastify";
@@ -10,28 +11,72 @@ const ProductEdit = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [productDetails, setProductDetails] = useState({});
   const [productNo, setProductNo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Please login first");
+      navigate('/login');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (isEditing && productNo) {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        navigate('/login');
+        return;
+      }
+
+      setLoading(true);
       axios
-        .get(`http://localhost:3001/target/product/${productNo}`)
+        .get(`http://localhost:3001/target/product/${productNo}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         .then((response) => {
           setProductDetails(response.data);
+          setLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching product details:", error);
-          toast.error("Failed to load product details.");
+          if (error.response?.status === 401) {
+            toast.error("Session expired. Please login again.");
+            localStorage.removeItem('accessToken');
+            navigate('/login');
+          } else {
+            toast.error("Failed to load product details.");
+          }
+          setLoading(false);
         });
     }
-  }, [isEditing, productNo]);
+  }, [isEditing, productNo, navigate]);
 
   const handleSave = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      toast.error("Session expired. Please login again.");
+      navigate('/login');
+      return;
+    }
+
     try {
+      setLoading(true);
       await axios.put(
         `http://localhost:3001/target/update-product/${productDetails.productNo}`,
         {
           ProductName: productDetails.ProductName,
           price: productDetails.price,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
 
@@ -39,10 +84,17 @@ const ProductEdit = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating product:", error);
-      toast.error("Failed to update product");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      } else {
+        toast.error(error.response?.data?.message || "Failed to update product");
+      }
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50 py-2 px-2 pt-3">
       <div className="w-full max-w-4xl mx-auto bg-white p-1 rounded-lg shadow-md">

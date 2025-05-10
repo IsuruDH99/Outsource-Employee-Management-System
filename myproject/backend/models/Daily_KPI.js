@@ -22,8 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         ActualTime: {
           type: DataTypes.DECIMAL(5, 2),
           allowNull: false,
-      },
-      
+        },
+        status: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: "actual-time-updated" // Set default value
+        }
       }
     );
   

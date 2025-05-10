@@ -11,7 +11,7 @@ function Home() {
     setLoading(true); // Start loading
     setTimeout(() => {
       navigate("/login"); // Navigate after delay
-    }, 1500);
+    }, 1000);
   };
 
   return (

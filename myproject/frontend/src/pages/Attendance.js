@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Attendance = () => {
   const currentDate = new Date().toISOString().split("T")[0];
@@ -7,11 +8,17 @@ const Attendance = () => {
   const [toDate, setToDate] = useState(currentDate);
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Fetch attendance data for current date when component mounts
-    handleFetchAttendance();
-  }, []); // Empty dependency array means this runs once on mount
+  const navigate = useNavigate();
+   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert("Please login first");
+      navigate('/login');
+    } else {
+      // Fetch initial data if token exists
+      handleFetchAttendance();
+    }
+  }, [navigate]);
 
   const handleFetchAttendance = async () => {
     if (!fromDate || !toDate) {
@@ -23,22 +30,37 @@ const Attendance = () => {
       return;
     }
 
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert("Session expired. Please login again.");
+      navigate('/login');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await axios.get(
         "http://localhost:3001/Employee_attendance_view/get-attendance",
         {
-          params: {
-            fromDate,
-            toDate,
-          },
+          params: { fromDate, toDate },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
 
       setAttendanceData(response.data);
     } catch (error) {
       console.error("Error fetching attendance:", error);
+      
+      if (error.response?.status === 401) {
+        alert("Session expired. Please login again.");
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      } else {
+        alert(error.response?.data?.message || "Failed to fetch attendance data");
+      }
     } finally {
       setLoading(false);
     }

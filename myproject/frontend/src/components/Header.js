@@ -30,6 +30,7 @@ const Header = () => {
 
     setTimeout(() => {
       setShowSuccess(false);
+      localStorage.removeItem("accessToken");
       navigate("/"); // Navigate to home page
     }, 0);
   };
