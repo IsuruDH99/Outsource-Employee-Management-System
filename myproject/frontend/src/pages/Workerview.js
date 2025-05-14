@@ -35,7 +35,7 @@ const Workerview = () => {
       setWorkers((prevWorkers) =>
         prevWorkers.filter((worker) => worker.epf !== selectedWorker.epf)
       );
-      toast.success("✅ Worker successfully deleted!");
+      toast.success(" Worker successfully deleted!");
     } catch (error) {
       console.error("Error deleting worker:", error);
       toast.error("❌ Failed to delete worker.");

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserReg = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,21 +17,21 @@ const UserReg = () => {
       });
 
       if (response.status === 201) {
-        setMessage("User registered successfully!");
+        toast.success("User registered successfully!");
         setEmail('');
         setPassword('');
       }
     } catch (error) {
-      setMessage("Error registering user");
+      toast.error("Error registering user");
       console.error(error);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">User Registration</h2>
-
-        {message && <p className="text-center text-sm text-red-600">{message}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

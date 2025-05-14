@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 const Salarycal = () => {
   // State management
@@ -26,7 +27,7 @@ const Salarycal = () => {
   const [inTime, setInTime] = useState("");
   const [outTime, setOutTime] = useState("");
   const [normalWorkHours, setNormalWorkHours] = useState(0);
-
+  const navigate = useNavigate();
   // Constants
   const HrID = "HR001";
 
@@ -252,97 +253,124 @@ const Salarycal = () => {
     calculateWorkHoursAndOvertime();
   }, [attendanceData, workerType, dailyRate, overtimeRate]);
 
-  const handleSubmit = async () => {
-    if (workerType === "Target" && addedProducts.length === 0) {
-      showError("⚠️ Please add at least one product.");
+ const handleSubmit = async () => {
+  if (workerType === "Target" && addedProducts.length === 0) {
+    showError("Please add at least one product.");
+    return;
+  }
+
+  try {
+    const epf = selectedEmployee.split(" - ")[0];
+    const name = selectedEmployee.split(" - ")[1];
+    let paymentData;
+    let statusToUpdate = "";
+
+    if (workerType === "Target") {
+      paymentData = {
+        type: "Target",
+        totalPayment: addedProducts.reduce((sum, p) => sum + p.payment, 0),
+      };
+      statusToUpdate = "Target-salary-added";
+    } else {
+      paymentData = {
+        type: "Day Pay",
+        totalPayment: totalDailySalary,
+        dailySalary,
+        overtimeHours,
+        overtimeSalary,
+        totalDailySalary,
+      };
+      statusToUpdate = "Daypay-salary-added";
+    }
+ const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert("Session expired. Please login again.");
+      navigate('/login');
       return;
     }
 
-    try {
-      const epf = selectedEmployee.split(" - ")[0];
-      const name = selectedEmployee.split(" - ")[1];
-      let paymentData;
-      let statusToUpdate = "";
 
-      if (workerType === "Target") {
-        paymentData = {
-          type: "Target",
-          totalPayment: addedProducts.reduce((sum, p) => sum + p.payment, 0),
-        };
-        statusToUpdate = "Target-salary-added";
-      } else {
-        paymentData = {
-          type: "Day Pay",
-          totalPayment: totalDailySalary,
-          dailySalary,
-          overtimeHours,
-          overtimeSalary,
-          totalDailySalary,
-        };
-        statusToUpdate = "Daypay-salary-added";
+    // Axios request config with JWT header
+    const axiosConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
+    };
 
-      // First save the salary data
-      if (workerType === "Target") {
-        const headerResponse = await axios.post(
-          "http://localhost:3001/Salaryheaders/add",
-          {
-            date,
-            epf,
-            totalPayment: paymentData.totalPayment,
-          }
-        );
+    // Save salary data (Target/Day Pay)
+    if (workerType === "Target") {
+      // 1. Save salary header
+      await axios.post(
+        "http://localhost:3001/Salaryheaders/add",
+        {
+          date,
+          epf,
+          totalPayment: paymentData.totalPayment,
+        },
+        axiosConfig
+      );
 
-        await Promise.all(
-          addedProducts.map((product) =>
-            axios.post("http://localhost:3001/Salarydetails/add", {
+      // 2. Save salary details (products)
+      await Promise.all(
+        addedProducts.map((product) =>
+          axios.post(
+            "http://localhost:3001/Salarydetails/add",
+            {
               epf,
               productNo: product.productNo,
               productName: product.productName,
               quantity: product.quantity,
               price: product.price,
               payment: product.payment,
-            })
+            },
+            axiosConfig
           )
-        );
-      } else {
-        const daypayResponse = await axios.post(
-          "http://localhost:3001/Salarydaypay/add",
-          {
-            date,
-            epf,
-            dailySalary,
-            overtimeHours,
-            overtimeSalary,
-            totalDailySalary,
-          }
-        );
-      }
+        )
+      );
+    } else {
+      // Save Day Pay data
+      await axios.post(
+        "http://localhost:3001/Salarydaypay/add",
+        {
+          date,
+          epf,
+          dailySalary,
+          overtimeHours,
+          overtimeSalary,
+          totalDailySalary,
+        },
+        axiosConfig
+      );
+    }
 
-      // Then update the attendance status
-      await axios.put("http://localhost:3001/attendance/update-status-td", {
+    // Update attendance status
+    await axios.put(
+      "http://localhost:3001/attendance/update-status-td",
+      {
         date,
         epf,
         status: statusToUpdate,
-      });
+      },
+      axiosConfig
+    );
 
-      // Reset form and show success
-      setDate("");
-      setSelectedEmployee("");
-      setDailySalary("");
-      setOvertimeHours("");
-      setOvertimeSalary("");
-      setTotalDailySalary("");
-      setInTime("");
-      setOutTime("");
-      setWorkHours("");
-      showSuccess("Successfully Saved!");
-      resetForm();
-    } catch (error) {
-      console.error("Submission error:", error);
-      showError(error.message || "Failed to submit salary. Please try again.");
-    }
-  };
+    // Reset form
+    setDate("");
+    setSelectedEmployee("");
+    setDailySalary("");
+    setOvertimeHours("");
+    setOvertimeSalary("");
+    setTotalDailySalary("");
+    setInTime("");
+    setOutTime("");
+    setWorkHours("");
+    showSuccess("Successfully Saved!");
+    resetForm();
+  } catch (error) {
+    console.error("Submission error:", error);
+    showError(error.message || "Failed to submit salary. Please try again.");
+  }
+};
 
   const resetForm = () => {
     setSelectedEmployee("");

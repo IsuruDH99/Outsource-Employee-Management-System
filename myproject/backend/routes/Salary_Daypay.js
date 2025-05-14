@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { Salary_Daypay } = require('../models');
-
-router.post("/add", async (req, res) => {
+const { validateToken } = require("../middlewares/AuthMiddleware");
+router.post("/add",validateToken, async (req, res) => {
   try {
     const { date, epf, dailySalary, overtimeHours, overtimeSalary, totalDailySalary } = req.body;
     

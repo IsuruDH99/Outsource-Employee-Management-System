@@ -95,55 +95,7 @@ const TaskAssign = () => {
 
     setTargetTime(step2.toFixed(2));
   };
-
-  const handleSave = async () => {
-    if (!date || !product || !quantity || !selectedEmployee || !targetTime) {
-      setErrorMessage("⚠️ Please fill in all required fields before saving.");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-      return;
-    }
-  
-    try {
-      const epf = selectedEmployee.split(" - ")[0];
-      const payload = {
-        date,
-        epf: parseInt(epf),
-        productNo: product,
-        productName: productName,
-        targetQuantity: parseInt(quantity),
-        targetTimeHrs: parseFloat(targetTime),
-      };
-      
-      // First save the task assignment
-      await axios.post("http://localhost:3001/TaskAssign/assign-task", payload);
-  
-      // Then update the attendance status to "Target"
-      await axios.put("http://localhost:3001/attendance/update-status", {
-        date,
-        epf: parseInt(epf),
-        status: "Target"
-      });
-  
-      toast.success("Successfully Assigned!", {
-        position: "top-center",
-        autoClose: 1200,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      handleClear();
-    } catch (error) {
-      console.error("Error saving task:", error);
-      setErrorMessage("⚠️ Failed to save task. Please try again.");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 1200);
-    }
-  };
-
-  const handleClear = () => {
+const handleClear = () => {
     setDate("");
     setProduct("");
     setTarget("");
@@ -153,6 +105,77 @@ const TaskAssign = () => {
     setErrorMessage("");
     setShowToast(false);
   };
+  const handleSave = async () => {
+  if (!date || !product || !quantity || !selectedEmployee || !targetTime) {
+    toast.error("⚠️ Please fill in all required fields before saving.", {
+      position: "top-center",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  try {
+    const epf = selectedEmployee.split(" - ")[0];
+    const payload = {
+      date,
+      epf: parseInt(epf),
+      productNo: product,
+      productName: productName,
+      targetQuantity: parseInt(quantity),
+      targetTimeHrs: parseFloat(targetTime),
+    };
+
+    // Get token from localStorage/session
+    const token = localStorage.getItem("token"); // or sessionStorage, cookies, etc.
+
+    // Add Authorization header
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    // First save the task assignment
+    await axios.post(
+      "http://localhost:3001/TaskAssign/assign-task",
+      payload,
+      config // Include headers
+    );
+
+    // Then update the attendance status to "Target"
+    await axios.put(
+      "http://localhost:3001/attendance/update-status",
+      {
+        date,
+        epf: parseInt(epf),
+        status: "Target",
+      },
+      //config // Include headers
+    );
+setDate("");
+    setProduct("");
+    setTarget("");
+    setQuantity("");
+    setSelectedEmployee("");
+    setTargetTime("");
+    toast.success("Successfully Assigned!", {
+      position: "top-center",
+      autoClose: 1200,
+    
+    });
+    
+     handleClear();
+  } catch (error) {
+    console.error("Error saving task:", error);
+    toast.error(" Failed to save task. Please try again.", {
+      position: "top-center",
+      autoClose: 1200,
+    
+    });
+  }
+};
+
+  
 
 const saveKpiData = async (task) => {
   try {

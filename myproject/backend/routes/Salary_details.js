@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { Salary_details } = require("../models");
+const { validateToken } = require("../middlewares/AuthMiddleware");
 
 // Add to Salarydetails table
-router.post("/add", async (req, res) => {
+router.post("/add",validateToken, async (req, res) => {
   try {
     const { epf, productNo, productName, quantity, price, payment } = req.body;
 

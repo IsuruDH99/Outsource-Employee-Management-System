@@ -57,7 +57,7 @@ router.post("/add-attendance",validateToken, async (req, res) => {
   }
 });
 
-router.put("/update-status",validateToken, async (req, res) => {
+router.put("/update-status", async (req, res) => {
   const { date, epf, status } = req.body;
 
   if (!date || !epf || !status) {
