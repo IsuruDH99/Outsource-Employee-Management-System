@@ -28,6 +28,10 @@ const Salarycal = () => {
   const [outTime, setOutTime] = useState("");
   const [normalWorkHours, setNormalWorkHours] = useState(0);
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState("");
+const [selectedEPF, setSelectedEPF] = useState("");
+const [productOptions, setProductOptions] = useState([]);
+
   // Constants
   const HrID = "HR001";
 
@@ -61,7 +65,7 @@ const Salarycal = () => {
     const fetchData = async () => {
       try {
         const [productsRes] = await Promise.all([
-          axios.get("http://localhost:3001/target/get-products"),
+          axios.get("http://localhost:3001/TaskAssign/get-products-by-date-epf"),
         ]);
 
         setProductList(productsRes.data);
@@ -84,6 +88,16 @@ const Salarycal = () => {
 
     fetchData();
   }, [date, workerType]);
+useEffect(() => {
+  if (selectedDate && selectedEPF) {
+    fetch(`/get-products-by-date-epf?date=${selectedDate}&epf=${selectedEPF}`)
+      .then(res => res.json())
+      .then(data => {
+        setProductOptions(data); // assuming [{ productNo, productName }]
+      })
+      .catch(err => console.error("Error fetching products:", err));
+  }
+}, [selectedDate, selectedEPF]);
 
   // Fetch attendance data and daily rate when employee is selected
   useEffect(() => {
@@ -437,18 +451,14 @@ const Salarycal = () => {
         <div className="flex items-center gap-6 mb-4 ml-16">
           <label className="w-20">Product:</label>
           <div className="relative w-20"></div>
-          <select
-            className="w-48 p-2 border rounded"
-            value={product}
-            onChange={(e) => setProduct(e.target.value)}
-          >
-            <option value="">Select Product</option>
-            {productList.map((p) => (
-              <option key={p.productNo} value={p.productNo}>
-                {p.productNo} - {p.ProductName} (Rs. {p.price})
-              </option>
-            ))}
-          </select>
+          <select>
+  {productOptions.map((product, index) => (
+    <option key={index} value={product.productNo}>
+      {product.productNo} - {product.productName}
+    </option>
+  ))}
+</select>
+
         </div>
 
         {/* Quantity Row */}
@@ -620,6 +630,7 @@ const Salarycal = () => {
               onChange={(e) => setDate(e.target.value)}
               className="w-full p-2 pl-3  pr-10 border rounded cursor-pointer"
             />
+
             <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500"></div>
           </div>
         </div>

@@ -82,64 +82,84 @@ const AddAttendance = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-4">Add Attendance</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          name="epf"
-          value={formData.epf}
-          onChange={handleChange}
-          placeholder="EPF Number"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="time"
-          name="intime"
-          value={formData.intime}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="time"
-          name="outtime"
-          value={formData.outtime}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </form>
+    <div className="mt-16 p-8 max-w-lg mx-auto bg-white rounded-2xl shadow-lg">
+  <h2 className="text-2xl text-center font-bold mb-6 text-gray-800">
+    Add Attendance
+  </h2>
+  <form onSubmit={handleSubmit} className="space-y-5">
+    <input
+      type="date"
+      name="date"
+      value={formData.date}
+      onChange={handleChange}
+      className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+      required
+    />
+    <input
+      type="text"
+      name="epf"
+      value={formData.epf}
+      onChange={handleChange}
+      placeholder="EPF Number"
+      className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+      required
+    />
+    <div className="space-y-4">
+  <div>
+    <label htmlFor="intime" className="block text-gray-700 font-medium mb-1">
+      In Time
+    </label>
+    <input
+      type="time"
+      id="intime"
+      name="intime"
+      value={formData.intime}
+      onChange={handleChange}
+      className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+      required
+    />
+  </div>
 
-      {/* Toast container for showing messages */}
-      <ToastContainer
-        position="top-center"
-        autoClose={1200}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{ marginTop: "65px" }}
-      />
-    </div>
+  <div>
+    <label htmlFor="outtime" className="block text-gray-700 font-medium mb-1">
+      Out Time
+    </label>
+    <input
+      type="time"
+      id="outtime"
+      name="outtime"
+      value={formData.outtime}
+      onChange={handleChange}
+      className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+      required
+    />
+  </div>
+</div>
+
+    <button
+      type="submit"
+      className="w-full bg-blue-500 text-white py-3 rounded-xl hover:bg-blue-600 transition duration-200"
+    >
+      Submit
+    </button>
+  </form>
+
+  {/* Toast container for showing messages */}
+  <ToastContainer
+    position="top-center"
+    autoClose={1200}
+    hideProgressBar={false}
+    newestOnTop={false}
+    closeOnClick
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+    style={{ marginTop: "70px" }}
+  />
+</div>
+
   );
 };
 
 export default AddAttendance;
+

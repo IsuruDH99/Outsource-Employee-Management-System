@@ -90,6 +90,32 @@ router.get("/get-tasks", async (req, res) => {
     console.error("Error fetching tasks:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+  
+});
+// Get products by date and EPF
+router.get("/get-products-by-date-epf", async (req, res) => {
+  try {
+    const { date, epf } = req.query;
+
+    if (!date || !epf) {
+      return res.status(400).json({ error: "Date and EPF are required" });
+    }
+
+    const products = await TaskAssign.findAll({
+      where: {
+        date,
+        epf,
+        status: "task-assigned"  // Only get tasks with "task-assigned" status
+      },
+      attributes: ["productNo", "productName"],
+      group: ["productNo", "productName"] // Grouping to remove duplicates
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products by date and EPF:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;
