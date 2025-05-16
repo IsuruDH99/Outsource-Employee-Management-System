@@ -70,9 +70,17 @@ const Target = ({ setIsEditing, setProductDetails }) => {
       setProducts(
         products.filter((p) => p.productNo !== updatedProduct.productNo)
       );
-      setIsModalOpen(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+      
+      // Reset modal state to refresh the popup
+      setDeleteConfirm(false);
+      setIsModalOpen(false);
+      setIsEditing(false);
+      
+      // Optionally: fetch products again to ensure fresh data
+      const response = await axios.get("http://localhost:3001/target/get-products");
+      setProducts(response.data);
     } catch (error) {
       console.error("Error deleting product:", error);
       setError("Failed to delete product.");

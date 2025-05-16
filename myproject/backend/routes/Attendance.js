@@ -3,73 +3,20 @@ const router = express.Router();
 const { Attendance } = require("../models");
 const { validateToken } = require("../middlewares/AuthMiddleware");
 const { Op } = require("sequelize");
-
-// POST: Add attendance
-// router.post("/add-attendance",validateToken, async (req, res) => {
-//   try {
-//     const { epf, date, intime, outtime, status } = req.body;
-
-//     if (!epf || !date || !intime || !outtime) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         error: "EPF, date, in-time and out-time are required fields" 
-//       });
-//     }
-
-//     // Check if attendance already exists for this employee on this date
-//     const existingAttendance = await Attendance.findOne({
-//       where: {
-//         epf,
-//         date
-//       }
-//     });
-
-//     if (existingAttendance) {
-//       return res.status(409).json({ 
-//         success: false, 
-//         error: "Attendance record already exists for this employee on the selected date",
-//         existingRecord: existingAttendance
-//       });
-//     }
-
-//     // If no existing record, create new attendance
-//     const attendance = await Attendance.create({
-//       epf,
-//       date,
-//       intime,
-//       outtime,
-//       status: status || "just-attend" // Default status if not provided
-//     });
-
-//     res.status(201).json({ 
-//       success: true, 
-//       message: "Attendance record added successfully",
-//       attendance 
-//     });
-
-//   } catch (error) {
-//     console.error("Already exists:", error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: "Failed to add attendance",
-//       details: error.message 
-//     });
-//   }
-// });
 const { Workeradd } = require("../models"); // Make sure to import the Workeradd model
 
 router.post("/add-attendance", validateToken, async (req, res) => {
   try {
     const { epf, date, intime, outtime, status } = req.body;
 
-    if (!epf || !date || !intime || !outtime) {
+    if (!epf || !date) {
       return res.status(400).json({ 
         success: false, 
-        error: "EPF, date, in-time and out-time are required fields" 
+        error: "EPF and date are required fields" 
       });
     }
 
-    // ✅ Check if EPF exists in Workeradd table
+    // Check if EPF exists in Workeradd table
     const workerExists = await Workeradd.findOne({ where: { epf } });
 
     if (!workerExists) {
@@ -88,27 +35,57 @@ router.post("/add-attendance", validateToken, async (req, res) => {
     });
 
     if (existingAttendance) {
-      return res.status(409).json({ 
-        success: false, 
-        error: "Attendance record already exists for this employee on the selected date",
-        existingRecord: existingAttendance
+      // If record exists and we're providing outtime
+      if (outtime) {
+        // Prevent updating if outtime already exists
+        if (existingAttendance.outtime) {
+          return res.status(409).json({ 
+            success: false, 
+            error: "Out-time already recorded for this employee on the selected date",
+            existingRecord: existingAttendance
+          });
+        }
+        // Update only if outtime doesn't exist
+        existingAttendance.outtime = outtime;
+        await existingAttendance.save();
+        return res.status(200).json({ 
+          success: true, 
+          message: "Out-time updated successfully",
+          attendance: existingAttendance
+        });
+      }
+      // If record exists and we're trying to add intime again
+      else if (intime) {
+        return res.status(409).json({ 
+          success: false, 
+          error: "In-time already recorded for this employee on the selected date",
+          existingRecord: existingAttendance
+        });
+      }
+    } else {
+      // If no existing record, we must have intime to create a new record
+      if (!intime) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "In-time is required to create a new attendance record" 
+        });
+      }
+
+      // Create new attendance record with just intime
+      const attendance = await Attendance.create({
+        epf,
+        date,
+        intime,
+        outtime: null, // Initialize outtime as null
+        status: status || "just-attend"
+      });
+
+      return res.status(201).json({ 
+        success: true, 
+        message: "In-time recorded successfully",
+        attendance 
       });
     }
-
-    // Create new attendance record
-    const attendance = await Attendance.create({
-      epf,
-      date,
-      intime,
-      outtime,
-      status: status || "just-attend"
-    });
-
-    res.status(201).json({ 
-      success: true, 
-      message: "Attendance record added successfully",
-      attendance 
-    });
 
   } catch (error) {
     console.error("Error adding attendance:", error);
