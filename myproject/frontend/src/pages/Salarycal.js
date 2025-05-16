@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const Salarycal = () => {
@@ -28,9 +28,7 @@ const Salarycal = () => {
   const [outTime, setOutTime] = useState("");
   const [normalWorkHours, setNormalWorkHours] = useState(0);
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState("");
-const [selectedEPF, setSelectedEPF] = useState("");
-const [productOptions, setProductOptions] = useState([]);
+  const [selectedEPF, setSelectedEPF] = useState("");
 
   // Constants
   const HrID = "HR001";
@@ -64,12 +62,6 @@ const [productOptions, setProductOptions] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes] = await Promise.all([
-          axios.get("http://localhost:3001/TaskAssign/get-products-by-date-epf"),
-        ]);
-
-        setProductList(productsRes.data);
-
         // Only fetch employees if date is selected
         if (date) {
           const endpoint =
@@ -88,18 +80,56 @@ const [productOptions, setProductOptions] = useState([]);
 
     fetchData();
   }, [date, workerType]);
-useEffect(() => {
-  if (selectedDate && selectedEPF) {
-    fetch(`/get-products-by-date-epf?date=${selectedDate}&epf=${selectedEPF}`)
-      .then(res => res.json())
-      .then(data => {
-        setProductOptions(data); // assuming [{ productNo, productName }]
-      })
-      .catch(err => console.error("Error fetching products:", err));
-  }
-}, [selectedDate, selectedEPF]);
+  // Fetch products for selected employee and date when in Target mode
+  useEffect(() => {
+    const fetchProductsForEmployee = async () => {
+      if (workerType === "Target" && date && selectedEmployee) {
+        try {
+          const epf = selectedEmployee.split(" - ")[0];
+          setSelectedEPF(epf);
 
-  // Fetch attendance data and daily rate when employee is selected
+          // First fetch assigned products from TaskAssign table
+          const taskAssignResponse = await axios.get(
+            `http://localhost:3001/TaskAssign/get-products-by?date=${date}&epf=${epf}`
+          );
+
+          // Then fetch product details from Target table for each assigned product
+          const productsWithDetails = await Promise.all(
+            taskAssignResponse.data.map(async (taskProduct) => {
+              try {
+                const targetResponse = await axios.get(
+                  `http://localhost:3001/Target/get-product-details?productNo=${taskProduct.productNo}`
+                );
+                return {
+                  ...taskProduct,
+                  ProductName: targetResponse.data.ProductName,
+                  price: targetResponse.data.price,
+                };
+              } catch (err) {
+                console.error(
+                  `Failed to fetch details for product ${taskProduct.productNo}:`,
+                  err
+                );
+                return {
+                  ...taskProduct,
+                  ProductName: "Unknown Product",
+                  price: 0,
+                };
+              }
+            })
+          );
+
+          setProductList(productsWithDetails);
+        } catch (err) {
+          console.error("Failed to fetch products:", err);
+          showError("Failed to fetch products. Please try again.");
+        }
+      }
+    };
+
+    fetchProductsForEmployee();
+  }, [date, selectedEmployee, workerType]);
+
   useEffect(() => {
     const fetchAttendanceAndRate = async () => {
       if (!date || !selectedEmployee) return;
@@ -154,7 +184,10 @@ useEffect(() => {
     }
 
     const selectedProduct = productList.find((p) => p.productNo === product);
-    if (!selectedProduct) return;
+    if (!selectedProduct) {
+      showError("Selected product not found");
+      return;
+    }
 
     const payment = parseFloat(selectedProduct.price) * parseFloat(quantity);
     const existingIndex = addedProducts.findIndex(
@@ -169,13 +202,12 @@ useEffect(() => {
         payment,
       };
       setAddedProducts(updatedProducts);
-      setQuantity("");
     } else {
       setAddedProducts((prev) => [
         ...prev,
         {
           productNo: product,
-          productName: selectedProduct.ProductName,
+          productName: selectedProduct.productName,
           quantity: parseFloat(quantity),
           price: parseFloat(selectedProduct.price),
           payment,
@@ -267,124 +299,123 @@ useEffect(() => {
     calculateWorkHoursAndOvertime();
   }, [attendanceData, workerType, dailyRate, overtimeRate]);
 
- const handleSubmit = async () => {
-  if (workerType === "Target" && addedProducts.length === 0) {
-    showError("Please add at least one product.");
-    return;
-  }
-
-  try {
-    const epf = selectedEmployee.split(" - ")[0];
-    const name = selectedEmployee.split(" - ")[1];
-    let paymentData;
-    let statusToUpdate = "";
-
-    if (workerType === "Target") {
-      paymentData = {
-        type: "Target",
-        totalPayment: addedProducts.reduce((sum, p) => sum + p.payment, 0),
-      };
-      statusToUpdate = "Target-salary-added";
-    } else {
-      paymentData = {
-        type: "Day Pay",
-        totalPayment: totalDailySalary,
-        dailySalary,
-        overtimeHours,
-        overtimeSalary,
-        totalDailySalary,
-      };
-      statusToUpdate = "Daypay-salary-added";
-    }
- const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert("Session expired. Please login again.");
-      navigate('/login');
+  const handleSubmit = async () => {
+    if (workerType === "Target" && addedProducts.length === 0) {
+      showError("Please add at least one product.");
       return;
     }
 
+    try {
+      const epf = selectedEmployee.split(" - ")[0];
+      const name = selectedEmployee.split(" - ")[1];
+      let paymentData;
+      let statusToUpdate = "";
 
-    // Axios request config with JWT header
-    const axiosConfig = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-
-    // Save salary data (Target/Day Pay)
-    if (workerType === "Target") {
-      // 1. Save salary header
-      await axios.post(
-        "http://localhost:3001/Salaryheaders/add",
-        {
-          date,
-          epf,
-          totalPayment: paymentData.totalPayment,
-        },
-        axiosConfig
-      );
-
-      // 2. Save salary details (products)
-      await Promise.all(
-        addedProducts.map((product) =>
-          axios.post(
-            "http://localhost:3001/Salarydetails/add",
-            {
-              epf,
-              productNo: product.productNo,
-              productName: product.productName,
-              quantity: product.quantity,
-              price: product.price,
-              payment: product.payment,
-            },
-            axiosConfig
-          )
-        )
-      );
-    } else {
-      // Save Day Pay data
-      await axios.post(
-        "http://localhost:3001/Salarydaypay/add",
-        {
-          date,
-          epf,
+      if (workerType === "Target") {
+        paymentData = {
+          type: "Target",
+          totalPayment: addedProducts.reduce((sum, p) => sum + p.payment, 0),
+        };
+        statusToUpdate = "Target-salary-added";
+      } else {
+        paymentData = {
+          type: "Day Pay",
+          totalPayment: totalDailySalary,
           dailySalary,
           overtimeHours,
           overtimeSalary,
           totalDailySalary,
+        };
+        statusToUpdate = "Daypay-salary-added";
+      }
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("Session expired. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      // Axios request config with JWT header
+      const axiosConfig = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      // Save salary data (Target/Day Pay)
+      if (workerType === "Target") {
+        // 1. Save salary header
+        await axios.post(
+          "http://localhost:3001/Salaryheaders/add",
+          {
+            date,
+            epf,
+            totalPayment: paymentData.totalPayment,
+          },
+          axiosConfig
+        );
+
+        // 2. Save salary details (products)
+        await Promise.all(
+          addedProducts.map((product) =>
+            axios.post(
+              "http://localhost:3001/Salarydetails/add",
+              {
+                epf,
+                productNo: product.productNo,
+                productName: product.productName,
+                quantity: product.quantity,
+                price: product.price,
+                payment: product.payment,
+              },
+              axiosConfig
+            )
+          )
+        );
+      } else {
+        // Save Day Pay data
+        await axios.post(
+          "http://localhost:3001/Salarydaypay/add",
+          {
+            date,
+            epf,
+            dailySalary,
+            overtimeHours,
+            overtimeSalary,
+            totalDailySalary,
+          },
+          axiosConfig
+        );
+      }
+
+      // Update attendance status
+      await axios.put(
+        "http://localhost:3001/attendance/update-status-td",
+        {
+          date,
+          epf,
+          status: statusToUpdate,
         },
         axiosConfig
       );
+
+      // Reset form
+      setDate("");
+      setSelectedEmployee("");
+      setDailySalary("");
+      setOvertimeHours("");
+      setOvertimeSalary("");
+      setTotalDailySalary("");
+      setInTime("");
+      setOutTime("");
+      setWorkHours("");
+      showSuccess("Successfully Saved!");
+      resetForm();
+    } catch (error) {
+      console.error("Submission error:", error);
+      showError(error.message || "Failed to submit salary. Please try again.");
     }
-
-    // Update attendance status
-    await axios.put(
-      "http://localhost:3001/attendance/update-status-td",
-      {
-        date,
-        epf,
-        status: statusToUpdate,
-      },
-      axiosConfig
-    );
-
-    // Reset form
-    setDate("");
-    setSelectedEmployee("");
-    setDailySalary("");
-    setOvertimeHours("");
-    setOvertimeSalary("");
-    setTotalDailySalary("");
-    setInTime("");
-    setOutTime("");
-    setWorkHours("");
-    showSuccess("Successfully Saved!");
-    resetForm();
-  } catch (error) {
-    console.error("Submission error:", error);
-    showError(error.message || "Failed to submit salary. Please try again.");
-  }
-};
+  };
 
   const resetForm = () => {
     setSelectedEmployee("");
@@ -451,14 +482,19 @@ useEffect(() => {
         <div className="flex items-center gap-6 mb-4 ml-16">
           <label className="w-20">Product:</label>
           <div className="relative w-20"></div>
-          <select>
-  {productOptions.map((product, index) => (
-    <option key={index} value={product.productNo}>
-      {product.productNo} - {product.productName}
-    </option>
-  ))}
-</select>
-
+          <select
+            className="w-48 p-2 border rounded"
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+            disabled={!date || !selectedEmployee}
+          >
+            <option value="">Select Product</option>
+            {productList.map((p) => (
+              <option key={p.productNo} value={p.productNo}>
+                {p.productNo} - {p.productName}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Quantity Row */}
@@ -582,7 +618,7 @@ useEffect(() => {
 
   return (
     <div className="flex justify-center pb-40 pt-12 bg-gray-100">
-      <ToastContainer 
+      <ToastContainer
         position="top-center"
         autoClose={1200}
         hideProgressBar={false}
@@ -593,7 +629,7 @@ useEffect(() => {
         pauseOnHover
         style={{ marginTop: "65px" }}
       />
-      
+
       <div className="w-full max-w-3xl bg-white pl-4 pr-4 pt-4 pb-24 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-center">
           Salary Calculator

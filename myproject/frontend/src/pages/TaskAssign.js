@@ -538,7 +538,7 @@ const saveKpiData = async (task) => {
                                   updated[index].actualTime = newActual;
                                   updated[index].kpi = (
                                     updated[index].targetTime / newActual
-                                  ).toFixed(2);
+                                  ).toFixed(3);
                                 } else {
                                   updated.push({
                                     taskId: task.id,

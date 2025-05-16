@@ -47,9 +47,11 @@ router.post("/assign-task", async (req, res) => {
 router.put("/update-task-status", async (req, res) => {
   try {
     const { taskId, status } = req.body;
-    
+
     if (!taskId || !status) {
-      return res.status(400).json({ error: "Task ID and status are required." });
+      return res
+        .status(400)
+        .json({ error: "Task ID and status are required." });
     }
 
     const updated = await TaskAssign.update(
@@ -76,7 +78,7 @@ router.get("/get-tasks", async (req, res) => {
     }
 
     const tasks = await TaskAssign.findAll({
-      where: { date, epf, status:"task-assigned"},
+      where: { date, epf, status: "task-assigned" },
     });
 
     // Format the response to include employee name
@@ -90,7 +92,6 @@ router.get("/get-tasks", async (req, res) => {
     console.error("Error fetching tasks:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-  
 });
 // Get products by date and EPF
 router.get("/get-products-by-date-epf", async (req, res) => {
@@ -105,16 +106,39 @@ router.get("/get-products-by-date-epf", async (req, res) => {
       where: {
         date,
         epf,
-        status: "task-assigned"  // Only get tasks with "task-assigned" status
+        status: "task-assigned", // Only get tasks with "task-assigned" status
       },
       attributes: ["productNo", "productName"],
-      group: ["productNo", "productName"] // Grouping to remove duplicates
+      group: ["productNo", "productName"], // Grouping to remove duplicates
     });
 
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products by date and EPF:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/get-products-by", async (req, res) => {
+  try {
+    const { date, epf } = req.query;
+
+    if (!date || !epf) {
+      return res.status(400).json({ error: "Date and EPF are required" });
+    }
+    console.log(date);
+    const results = await TaskAssign.findAll({
+      attributes: ["productNo", "productName"],
+      where: { date, epf },
+      group: ["productNo", "productName"],
+      order: [["productName", "ASC"]],
+      raw: true,
+    });
+
+    res.json(results);
+  } catch (err) {
+    console.error("Error fetching products by date and EPF:", err);
+    res.status(500).json({ error: "Failed to fetch products" });
   }
 });
 

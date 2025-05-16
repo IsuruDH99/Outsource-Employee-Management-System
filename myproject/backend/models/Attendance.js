@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     intime: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     outtime: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     status: {
       type: DataTypes.STRING,

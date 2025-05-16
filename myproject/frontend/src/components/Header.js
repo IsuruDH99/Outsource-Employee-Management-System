@@ -60,7 +60,9 @@ const Header = () => {
                 to="/dashboard"
                 className={({ isActive }) =>
                   `text-base font-semibold transition duration-200 no-underline ${
-                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
+                    isActive
+                      ? "text-gray-300"
+                      : "text-white hover:text-gray-400"
                   }`
                 }
               >
@@ -70,7 +72,10 @@ const Header = () => {
 
             {/* Manage Employee */}
             <li className="relative">
-              <div onClick={() => toggleDropdown("employee")} className={menuStyle("employee")}>
+              <div
+                onClick={() => toggleDropdown("employee")}
+                className={menuStyle("employee")}
+              >
                 Manage Employee <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "employee" && (
@@ -96,27 +101,48 @@ const Header = () => {
                 </ul>
               )}
             </li>
-
+            {/* Attendance */}
             <li className="relative">
-              <NavLink
-                to="/attendance"
-                className={({ isActive }) =>
-                  `text-base font-semibold transition duration-200 no-underline ${
-                    isActive ? "text-gray-300" : "text-white hover:text-gray-400"
-                  }`
-                }
+              <div
+                onClick={() => toggleDropdown("attend")}
+                className={menuStyle("attend")}
               >
-                View Attendance
-              </NavLink>
+                Attendance <span className="ml-1 text-xs">▾</span>
+              </div>
+              {openDropdown === "attend" && (
+                <ul className="mt-1 bg-white text-black rounded shadow px-2 py-1 space-y-1 absolute z-10 text-sm">
+                  <li>
+                    <NavLink
+                      to="/add-attendance"
+                      className="font-bold hover:underline"
+                      onClick={closeDropdown}
+                    >
+                      Add Attendance
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/attendance"
+                      className="font-bold hover:underline"
+                      onClick={closeDropdown}
+                    >
+                      View Attendance
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
             </li>
 
             {/* Manage Work Package */}
             <li className="relative">
-              <div onClick={() => toggleDropdown("work")} className={menuStyle("work")}>
+              <div
+                onClick={() => toggleDropdown("work")}
+                className={menuStyle("work")}
+              >
                 Manage Work Package <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "work" && (
-                <ul className="mt-1 bg-white text-black rounded shadow px-3 py-1 space-y-1 absolute z-10 text-sm">
+                <ul className="mt-1 bg-white text-black rounded shadow px-2 py-1 space-y-1 absolute z-10 text-sm">
                   <li>
                     <NavLink
                       to="/taskassign"
@@ -141,7 +167,10 @@ const Header = () => {
 
             {/* Salary Calculation */}
             <li className="relative">
-              <div onClick={() => toggleDropdown("salary")} className={menuStyle("salary")}>
+              <div
+                onClick={() => toggleDropdown("salary")}
+                className={menuStyle("salary")}
+              >
                 Salary Calculation <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "salary" && (
@@ -170,7 +199,10 @@ const Header = () => {
 
             {/* Manage Products */}
             <li className="relative">
-              <div onClick={() => toggleDropdown("manage")} className={menuStyle("manage")}>
+              <div
+                onClick={() => toggleDropdown("manage")}
+                className={menuStyle("manage")}
+              >
                 Manage Products <span className="ml-1 text-xs">▾</span>
               </div>
               {openDropdown === "manage" && (

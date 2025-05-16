@@ -72,7 +72,7 @@ const AddAttendance = () => {
         } else if (error.response.status === 409) {
           toast.error("Attendance record already exists.");
         } else {
-          toast.error(error.response.data.message || "An error occurred");
+          toast.error(error.response.data.message || "This Employee  does not exist ");
         }
       } else {
         console.error(error);

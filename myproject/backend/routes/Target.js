@@ -90,4 +90,21 @@ router.delete("/delete-product/:productNo", async (req, res) => {
   }
 });
 
+// In your Target controller
+router.get('/get-product-details', async (req, res) => {
+  try {
+    const { productNo } = req.query;
+    const product = await Target.findOne({ where:{productNo} });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json({
+      productName: product.ProductName,
+      price: product.price
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

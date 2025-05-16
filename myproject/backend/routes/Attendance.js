@@ -5,7 +5,60 @@ const { validateToken } = require("../middlewares/AuthMiddleware");
 const { Op } = require("sequelize");
 
 // POST: Add attendance
-router.post("/add-attendance",validateToken, async (req, res) => {
+// router.post("/add-attendance",validateToken, async (req, res) => {
+//   try {
+//     const { epf, date, intime, outtime, status } = req.body;
+
+//     if (!epf || !date || !intime || !outtime) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         error: "EPF, date, in-time and out-time are required fields" 
+//       });
+//     }
+
+//     // Check if attendance already exists for this employee on this date
+//     const existingAttendance = await Attendance.findOne({
+//       where: {
+//         epf,
+//         date
+//       }
+//     });
+
+//     if (existingAttendance) {
+//       return res.status(409).json({ 
+//         success: false, 
+//         error: "Attendance record already exists for this employee on the selected date",
+//         existingRecord: existingAttendance
+//       });
+//     }
+
+//     // If no existing record, create new attendance
+//     const attendance = await Attendance.create({
+//       epf,
+//       date,
+//       intime,
+//       outtime,
+//       status: status || "just-attend" // Default status if not provided
+//     });
+
+//     res.status(201).json({ 
+//       success: true, 
+//       message: "Attendance record added successfully",
+//       attendance 
+//     });
+
+//   } catch (error) {
+//     console.error("Already exists:", error);
+//     res.status(500).json({ 
+//       success: false, 
+//       error: "Failed to add attendance",
+//       details: error.message 
+//     });
+//   }
+// });
+const { Workeradd } = require("../models"); // Make sure to import the Workeradd model
+
+router.post("/add-attendance", validateToken, async (req, res) => {
   try {
     const { epf, date, intime, outtime, status } = req.body;
 
@@ -13,6 +66,16 @@ router.post("/add-attendance",validateToken, async (req, res) => {
       return res.status(400).json({ 
         success: false, 
         error: "EPF, date, in-time and out-time are required fields" 
+      });
+    }
+
+    // ✅ Check if EPF exists in Workeradd table
+    const workerExists = await Workeradd.findOne({ where: { epf } });
+
+    if (!workerExists) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "EPF not found in worker records" 
       });
     }
 
@@ -32,13 +95,13 @@ router.post("/add-attendance",validateToken, async (req, res) => {
       });
     }
 
-    // If no existing record, create new attendance
+    // Create new attendance record
     const attendance = await Attendance.create({
       epf,
       date,
       intime,
       outtime,
-      status: status || "just-attend" // Default status if not provided
+      status: status || "just-attend"
     });
 
     res.status(201).json({ 
@@ -48,7 +111,7 @@ router.post("/add-attendance",validateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Already exists:", error);
+    console.error("Error adding attendance:", error);
     res.status(500).json({ 
       success: false, 
       error: "Failed to add attendance",

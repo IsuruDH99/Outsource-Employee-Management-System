@@ -12,6 +12,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-wrap justify-center gap-4 p-5 pt-2">
+      
       {/* Manage Employee Card with Dropdown */}
       <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
@@ -36,7 +37,7 @@ const Dashboard = () => {
       </div>
 
       {/* View Attendance Card */}
-      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+      {/* <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-5">
           <h5 className="mb-2 text-2xl font-bold">View Attendance</h5>
           <img
@@ -47,6 +48,27 @@ const Dashboard = () => {
           <Button onClick={() => navigate("/attendance")}>
             View Attendance
           </Button>
+        </div>
+      </div> */}
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="p-5">
+          <h5 className="mb-2 text-2xl font-bold">Attendance</h5>
+          <img
+            src={attendance}
+            alt="View Attendance"
+            className="w-full h-40 object-cover mb-3"
+          />
+          <Dropdown>
+            <Dropdown.Toggle variant="primary">Attendance</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => navigate("/add-attendance")}>
+                Add Attendance
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate("/attendance")}>
+                View Attendance
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
       </div>
 
